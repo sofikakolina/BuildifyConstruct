@@ -27,7 +27,7 @@ export default function Home() {
       <Link href="/create-project">Создать проект...</Link>
       <div className="grid grid-cols-3 gap-8 w-full h-full">
         {
-          projectItems.map(item => <ProjectCard item={item}/>)
+          projectItems.map(item => <ProjectCard item={item} key={item.id}/>)
         }
       </div>
     </div>
