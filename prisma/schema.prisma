@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Admin
+  PrivateOwner
+  Executer
+  Client
+}
+
+model User {
+  id             String     @id @default(cuid())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  firstName      String
+  lastName       String
+  nickName       String?    @unique
+  email          String?    @unique
+  emailVerified  DateTime?
+  hashedPassword String?
+  image          String?
+  role           Role       @default(Executer)
+  projects       Project[]  @relation("UserProjects")
+  tasks          Task[]     @relation("UserTasks")
+  jobs           Job[]      @relation("UserJobs") // Добавлено для связи с заданиями
+  sentMessages   Message[]   @relation("SenderMessages")
+  receivedMessages Message[]  @relation("ReceiverMessages")
+}
+
+
+
+model Project {
+  id        String   @id @default(cuid())
+  adminId   String?
+  createdAt DateTime @default(now())
+  name      String?
+  image     String?
+  users     User[]   @relation("UserProjects")
+  jobs      Job[]    // Задачи в проекте
+  documents Document[] // Документы, привязанные к проекту
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  projectId   String
+  projectName String
+  userAssignment User[] @relation("UserJobs") // Обратная связь для пользователей, назначенных на работу
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+
+enum JobStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  content     String
+  createdAt   DateTime @default(now())
+  sender      User     @relation("SenderMessages", fields: [senderId], references: [id])
+  receiver    User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  assignedTo  User     @relation(fields: [userId], references: [id], name: "UserTasks")  // Обратная связь для задач
+  userId      String
+  status      TaskStatus @default(TODO)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
