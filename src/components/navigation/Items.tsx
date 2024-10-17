@@ -1,194 +1,64 @@
-type Props = {
-    role: string
-}
+import { RoleType } from "@/types/types"
 
 export const AdminMenuItems = [
-    {
-        text: 'Аналитика',
-        path: '/dashboard/users',
-    },
-    {
-        text: 'Календарный график',
-        path: '/dashboard/taxes',
-    },
-    {
-        text: 'Ведомость объемов работ',
-        path: '/dashboard/products'
-    },
-    {
-        text: 'Конъюктурный анализ',
-        path: '/dashboard/productsRequests'
-    },
-    {
-        text: 'Доска задач',
-        path: '/dashboard/materials'
-    },
-    {
-        text: 'Сообщения',
-        path: '/dashboard/orders'
-    },
-    {
-        text: 'Клиенты',
-        path: '/dashboard/deliveryMethods'
-    },
-    {
-        text: 'Команда проекта',
-        path: '/dashboard/emailTemplates'
-    },
-    {
-        text: 'Документы',
-        path: '/dashboard/invoices'
-    },
-    {
-        text: 'Платежные документы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Материалы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Расчет временных сооружений',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Фотоотчеты',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Инициализация закупок',
-        path: '/dashboard/payments'
-    }
+    { text: 'Аналитика', path: '#' },
+    { text: 'Календарный график', path: '#' },
+    { text: 'Ведомость объемов работ', path: '#' },
+    { text: 'Конъюктурный анализ', path: '#' },
+    { text: 'Доска задач', path: '#' },
+    { text: 'Сообщения', path: '#' },
+    { text: 'Клиенты', path: '#' },
+    { text: 'Команда проекта', path: '#' },
+    { text: 'Документы', path: '#' },
+    { text: 'Платежные документы', path: '#' },
+    { text: 'Материалы', path: '#' },
+    { text: 'Расчет временных сооружений', path: '#' },
+    { text: 'Фотоотчеты', path: '#' },
+    { text: 'Инициализация закупок', path: '#' }
 ]
 
 export const ExecuteMenuItems = [
-    {
-        text: 'Аналитика',
-        path: '/dashboard/users',
-    },
-    {
-        text: 'Календарный график',
-        path: '/dashboard/taxes',
-    },
-    {
-        text: 'Ведомость объемов работ',
-        path: '/dashboard/products'
-    },
-    {
-        text: 'Конъюктурный анализ',
-        path: '/dashboard/productsRequests'
-    },
-    {
-        text: 'Доска задач',
-        path: '/dashboard/materials'
-    },
-    {
-        text: 'Сообщения',
-        path: '/dashboard/orders'
-    },
-    {
-        text: 'Клиенты',
-        path: '/dashboard/deliveryMethods'
-    },
-    {
-        text: 'Команда проекта',
-        path: '/dashboard/emailTemplates'
-    },
-    {
-        text: 'Документы',
-        path: '/dashboard/invoices'
-    },
-    {
-        text: 'Платежные документы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Материалы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Расчет временных сооружений',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Фотоотчеты',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Инициализация закупок',
-        path: '/dashboard/payments'
-    }
+    { text: 'Аналитика', path: '#' },
+    { text: 'Календарный график', path: '#' },
+    { text: 'Ведомость объемов работ', path: '#' },
+    { text: 'Конъюктурный анализ', path: '#' },
+    { text: 'Доска задач', path: '#' },
+    { text: 'Сообщения', path: '#' },
+    { text: 'Клиенты', path: '#' },
+    { text: 'Команда проекта', path: '#' },
+    { text: 'Документы', path: '#' },
+    { text: 'Платежные документы', path: '#' },
+    { text: 'Материалы', path: '#' },
+    { text: 'Расчет временных сооружений', path: '#' },
+    { text: 'Фотоотчеты', path: '#' },
+    { text: 'Инициализация закупок', path: '#' }
 ]
 
 export const ClientMenuItems = [
-    {
-        text: 'Аналитика',
-        path: '/dashboard/users',
-    },
-    {
-        text: 'Календарный график',
-        path: '/dashboard/taxes',
-    },
-    {
-        text: 'Ведомость объемов работ',
-        path: '/dashboard/products'
-    },
-    {
-        text: 'Конъюктурный анализ',
-        path: '/dashboard/productsRequests'
-    },
-    {
-        text: 'Доска задач',
-        path: '/dashboard/materials'
-    },
-    {
-        text: 'Сообщения',
-        path: '/dashboard/orders'
-    },
-    {
-        text: 'Клиенты',
-        path: '/dashboard/deliveryMethods'
-    },
-    {
-        text: 'Команда проекта',
-        path: '/dashboard/emailTemplates'
-    },
-    {
-        text: 'Документы',
-        path: '/dashboard/invoices'
-    },
-    {
-        text: 'Платежные документы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Материалы',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Расчет временных сооружений',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Фотоотчеты',
-        path: '/dashboard/payments'
-    },
-    {
-        text: 'Инициализация закупок',
-        path: '/dashboard/payments'
-    }
+    { text: 'Аналитика', path: '#' },
+    { text: 'Календарный график', path: '#' },
+    { text: 'Ведомость объемов работ', path: '#' },
+    { text: 'Конъюктурный анализ', path: '#' },
+    { text: 'Доска задач', path: '#' },
+    { text: 'Сообщения', path: '#' },
+    { text: 'Клиенты', path: '#' },
+    { text: 'Команда проекта', path: '#' },
+    { text: 'Документы', path: '#' },
+    { text: 'Платежные документы', path: '#' },
+    { text: 'Материалы', path: '#' },
+    { text: 'Расчет временных сооружений', path: '#' },
+    { text: 'Фотоотчеты', path: '#' },
+    { text: 'Инициализация закупок', path: '#' }
 ]
 
-
-
-
-const Items = ({role}: Props) => {
-
-    switch(role){
-        case "Admin": return AdminMenuItems
-        case "Executer": return AdminMenuItems
-        case "Client": return AdminMenuItems
-    }
+type Props = {
+    role: RoleType
 }
 
-export default Items
+export function getSidebarItems({role}: Props){
+    switch(role){
+        case "Admin": return AdminMenuItems
+        case "Executer": return ExecuteMenuItems
+        case "Client": return ClientMenuItems
+    }
+}

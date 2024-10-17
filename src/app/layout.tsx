@@ -32,7 +32,10 @@ export default function RootLayout({
       >
         <Navbar />
         {/* <Dashboard /> */}
-        <div className={`h-[calc(100vh-${NavbarHeight}px)]`}>
+        <div
+          className="h-full"
+          style={{ height: `calc(100vh - ${NavbarHeight}px)` }}
+        >
           {children}
         </div>
       </body>

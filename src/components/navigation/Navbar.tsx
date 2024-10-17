@@ -1,9 +1,12 @@
-import React from 'react'
 import { NavbarHeight } from './Sizes'
-
 const Navbar = () => {
+  console.log(NavbarHeight)
+
   return (
-    <div className={`bg-primary flex justify-center h-[${NavbarHeight}px]`}>
+    <div 
+      style={{ height: `${NavbarHeight}px` }}
+      className={`bg-primary flex justify-center`}
+    >
         <div className='flex justify-between container items-center'>
             <div>
               <h1 className='text-white text-2xl'>BuildifyConstruct</h1>
