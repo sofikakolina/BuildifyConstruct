@@ -28,6 +28,14 @@ export default function RegisterPage() {
     });
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value as Role, // Приводим значение к типу Role
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -116,7 +124,7 @@ export default function RegisterPage() {
               id="role"
               name="role"
               value={formData.role}
-              onChange={handleChange}
+              onChange={handleSelectChange}
               className="block shadow-sm mt-1 px-3 py-2 border border-gray-300 focus:border-blue-500 rounded-md focus:outline-none focus:ring-blue-500 w-full"
               required
             >

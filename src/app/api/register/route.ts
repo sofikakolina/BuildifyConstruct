@@ -29,8 +29,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
+    // Используем переменную `error` для получения дополнительной информации
+    console.error("Registration error:", error);
+
     return NextResponse.json(
-      { error: "User already exists" },
+      { error: "User already exists or an error occurred" },
       { status: 400 }
     );
   }

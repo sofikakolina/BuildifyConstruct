@@ -9,7 +9,7 @@ const Sidebar = () => {
 
 	return (
 		<div
-			className="bg-primary absolute border-t-2 border-t-[#0000001f] flex justify-center"
+			className="absolute flex justify-center bg-primary border-t-[#0000001f] border-t-2"
 			style={{
 				width: `${SidebarWidth}px`,
 				height: `calc(100vh - ${NavbarHeight}px)`,
@@ -17,11 +17,11 @@ const Sidebar = () => {
 			}}
 		>
 	        <div className='flex flex-col gap-0 pt-10'>
-				{
+				{ menuItems &&
 					menuItems.map((item, index) => (
 						<Link
 							href={item.path}
-							className='text-white px-10 py-3'
+							className='px-10 py-3 text-white'
 							key={index}
 						>
 							{item.text}

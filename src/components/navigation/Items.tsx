@@ -1,4 +1,4 @@
-import { RoleType } from "../../types/types"
+import { Role } from '@prisma/client';
 
 export const AdminMenuItems = [
     { text: 'Аналитика', path: '#' },
@@ -52,7 +52,7 @@ export const ClientMenuItems = [
 ]
 
 type Props = {
-    role: RoleType
+    role: Role
 }
 
 export function getSidebarItems({role}: Props){
