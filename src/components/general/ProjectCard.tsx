@@ -10,7 +10,10 @@ type Props = {
 
 const ProjectCard = ({item}: Props) => {
   return (
-    <Link href={`project/${item.id}`} className=' bg-primary w-full flex items-center justify-center rounded-md'>
+    <Link 
+      href={`/dashboard/project/${item.id}`} 
+      className='flex justify-center items-center bg-primary rounded-md w-full aspect-[16/9]'
+    >
         <h3 className='text-white'>{item.name}</h3>
     </Link>
   )

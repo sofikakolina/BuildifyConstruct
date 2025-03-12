@@ -10,7 +10,11 @@ const config: Config = {
     extend: {
       colors: {
         primary:{
-          DEFAULT: "#263238"
+          DEFAULT: "#263238",
+        },
+        gold: {
+          DEFAULT: "#f69220",
+          hover: "#bb6a0e",
         },
         background: "var(--background)",
         foreground: "var(--foreground)",

@@ -1,4 +1,4 @@
-import { RoleType } from "@/types/types"
+import { RoleType } from "../../types/types"
 
 export const AdminMenuItems = [
     { text: 'Аналитика', path: '#' },

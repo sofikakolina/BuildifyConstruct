@@ -1,1 +1,0 @@
-export type RoleType = "Admin" | "Executer" | "Client" 

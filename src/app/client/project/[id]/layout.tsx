@@ -10,7 +10,7 @@ export default function RootLayout({
         <div>
             <Sidebar />
             <div
-                className="absolute bottom-0 right-0 p-10"
+                className="right-0 bottom-0 absolute p-10"
                 style={{
                     height: `calc(100vh - ${NavbarHeight}px)`,
                     width: `calc(100vw - ${SidebarWidth}px)`,
