@@ -76,6 +76,7 @@ model VerificationToken {
   expires    DateTime
   userId String?
   user User?  @relation(fields: [userId], references: [id])
+
  
   @@unique([identifier, token])
   @@map("verification_tokens")
