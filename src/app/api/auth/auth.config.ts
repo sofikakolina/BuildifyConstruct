@@ -47,7 +47,6 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid password");
         }
 
-        // Возвращаем объект пользователя с нужными данными
         return {
           id: user.id,
           email: user.email || undefined, // Преобразуем null в undefined
