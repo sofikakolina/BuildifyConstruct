@@ -6,7 +6,6 @@ import { NavbarHeight } from './Sizes';
 import { useRouter } from "next/navigation";
 import { VscSignOut } from "react-icons/vsc";
 import Link from "next/link";
-
 const Navbar = () => {
   const { data: session } = useSession();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
