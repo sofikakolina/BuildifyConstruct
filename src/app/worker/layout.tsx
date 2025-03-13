@@ -3,7 +3,7 @@ import "@/styles/globals.css";
 import Navbar from "@/components/navigation/Navbar";
 import { NavbarHeight } from "@/components/navigation/Sizes";
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;

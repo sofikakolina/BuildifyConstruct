@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ProjectCard from "../../components/general/ProjectCard";
+import ProjectCard from "@/components/general/ProjectCard";
 
 interface Project {
   id: string;

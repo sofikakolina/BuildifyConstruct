@@ -3,7 +3,8 @@ import localFont from "next/font/local";
 import "../styles/globals.css";
 import { NavbarHeight } from "../components/navigation/Sizes";
 import { SessionProvider } from "next-auth/react";
-
+import { Provider } from 'react-redux'
+import { store } from "@/lib/store"
 const geistSans = localFont({
   src: "../public/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -23,17 +24,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <SessionProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {/* <Dashboard /> */}
-          <div
-            className="h-full"
-            style={{ height: `calc(100vh - ${NavbarHeight}px)` }}
+        <Provider store={store}>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
-            {children}
-          </div>
-        </body>
+            {/* <Dashboard /> */}
+            <div
+              className="h-full"
+              style={{ height: `calc(100vh - ${NavbarHeight}px)` }}
+            >
+              {children}
+            </div>
+          </body>
+        </Provider>
       </SessionProvider>
     </html>
   );

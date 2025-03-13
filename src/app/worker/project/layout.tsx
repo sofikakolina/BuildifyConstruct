@@ -1,7 +1,7 @@
 import Sidebar from "@/components/navigation/Sidebar";
 import { NavbarHeight, SidebarWidth } from "@/components/navigation/Sizes";
 
-export default function RootLayout({
+export default function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;

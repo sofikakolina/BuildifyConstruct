@@ -44,5 +44,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/client/:path*", "/worker/:path*"], // Защищенные маршруты
+  matcher: ["/dashboard/:path*", "/client/:path*", "/worker/:path*", "/"], // Защищенные маршруты
 };

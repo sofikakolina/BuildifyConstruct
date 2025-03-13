@@ -1,11 +1,14 @@
+"use client"
 import Link from 'next/link'
 import React from 'react'
 import { NavbarHeight, SidebarWidth } from './Sizes'
 import { getSidebarItems } from './Items'
+import { useSession } from "next-auth/react";
+import { Role } from '@prisma/client';
 
 const Sidebar = () => {
-	const role = "Admin"
-	const menuItems = getSidebarItems({role})
+	const { data: session } = useSession();
+	const menuItems = getSidebarItems({role: session?.user.role as Role})
 
 	return (
 		<div
