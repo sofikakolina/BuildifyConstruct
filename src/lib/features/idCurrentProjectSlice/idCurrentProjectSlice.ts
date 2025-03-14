@@ -1,36 +1,60 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '@/lib/store'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { RootState } from '@/lib/store';
 
-// Define a type for the slice state
+// Определяем тип для состояния
 export interface IdCurrentProjectState {
-  value: string
+  value: string;
 }
 
-// Define the initial state using that type
-const initialState: IdCurrentProjectState = {
-  value: ''
-}
-// idCurrentProject
+// Функция для загрузки состояния из localStorage
+const loadStateFromLocalStorage = (): IdCurrentProjectState => {
+  try {
+    const savedState = localStorage.getItem('idCurrentProject');
+    if (savedState) {
+      return { value: JSON.parse(savedState) };
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке состояния из localStorage:', error);
+  }
+  return { value: '' }; // Возвращаем начальное состояние, если в localStorage ничего нет
+};
+
+// Инициализируем состояние, загружая его из localStorage
+const initialState: IdCurrentProjectState = loadStateFromLocalStorage();
+
+// Создаём slice
 export const idCurrentProjectSlice = createSlice({
   name: 'idCurrentProject',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    // setIdCurrentProject: state => {
-    //     state.value += 1
-    // },
+    // Устанавливаем значение idCurrentProject
     setIdCurrentProject: (state, action: PayloadAction<string>) => {
-        state.value = action.payload
+      state.value = action.payload;
+      // Сохраняем новое значение в localStorage
+      try {
+        localStorage.setItem('idCurrentProject', JSON.stringify(action.payload));
+      } catch (error) {
+        console.error('Ошибка при сохранении состояния в localStorage:', error);
+      }
     },
-    cleanIdCurrentProject: state => {
-      state.value = ''
-    }
-  }
-})
+    // Очищаем значение idCurrentProject
+    cleanIdCurrentProject: (state) => {
+      state.value = '';
+      // Удаляем значение из localStorage
+      try {
+        localStorage.removeItem('idCurrentProject');
+      } catch (error) {
+        console.error('Ошибка при удалении состояния из localStorage:', error);
+      }
+    },
+  },
+});
 
-export const { setIdCurrentProject, cleanIdCurrentProject } = idCurrentProjectSlice.actions
+// Экспортируем actions
+export const { setIdCurrentProject, cleanIdCurrentProject } = idCurrentProjectSlice.actions;
 
-// Other code such as selectors can use the imported `RootState` type
-export const selectIdCurrentProject = (state: RootState) => state.idCurrentProject.value
+// Селектор для получения значения idCurrentProject
+export const selectIdCurrentProject = (state: RootState) => state.idCurrentProject.value;
 
-export default idCurrentProjectSlice.reducer
+// Экспортируем reducer
+export default idCurrentProjectSlice.reducer;

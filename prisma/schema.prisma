@@ -62,8 +62,9 @@ model User {
   // receivedMessages Message[]  @relation("ReceiverMessages")
 
   VerificationToken VerificationToken[]
-
-  Project Project[] @relation("UserProjects")
+  
+  projectId String[]
+  project Project[] @relation("UserProjects")
 }
 
  
@@ -90,6 +91,7 @@ model Project {
   createdAt DateTime @default(now())
   name      String?
   image     String?
+  userId    String[]
   users     User[]   @relation("UserProjects")
   documents Document[] // Документы, привязанные к проекту
 }
