@@ -28,14 +28,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { idCurrentProject } = await request.json();
-    console.log(idCurrentProject)
     // Проверяем, что пользователь с adminId существует и имеет роль "Admin"
     const adminUser = await prisma.user.findFirst({
       where: {
         role: "Admin", // Проверяем, что роль пользователя — "Admin"
       },
     });
-    console.log(adminUser)
     if (!adminUser) {
       return NextResponse.json(
         { error: "User with the provided ID is not an admin" },

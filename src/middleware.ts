@@ -8,8 +8,6 @@ export async function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
   const session = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  console.log("Token:", token); // Логируем токен для отладки
-  console.log(session?.role)
   if (!token || !session?.role) {
     console.log("No token, redirecting to /auth/signin"); // Логируем редирект
     return NextResponse.redirect(new URL("/auth/signin", request.url));

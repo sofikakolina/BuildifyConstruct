@@ -36,7 +36,6 @@ export async function POST(request: Request) {
         role: "Admin", // Проверяем, что роль пользователя — "Admin"
       },
     });
-    console.log(adminUser)
     if (!adminUser) {
       return NextResponse.json(
         { error: "User with the provided ID is not an admin" },

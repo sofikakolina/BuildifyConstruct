@@ -5,6 +5,8 @@ import { NavbarHeight } from "../components/navigation/Sizes";
 import { SessionProvider } from "next-auth/react";
 import { Provider } from 'react-redux'
 import { store } from "@/lib/store"
+import { Toaster } from 'react-hot-toast';
+
 const geistSans = localFont({
   src: "../public/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -35,6 +37,7 @@ export default function RootLayout({
             >
               {children}
             </div>
+            <Toaster />
           </body>
         </Provider>
       </SessionProvider>
