@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/components/dashboard/project/tasks/KanbanContext.jsx"  ],
   "exclude": [
     "node_modules"
   ]
