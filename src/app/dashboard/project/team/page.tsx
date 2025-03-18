@@ -26,14 +26,14 @@ const Page = () => {
     }
 
     fetchData()
-  }, [])
+  }, [idCurrentProject])
   const hadnleAddUserToProject = async(userId: string) =>{
     try{
       const addUser = await axios.post("/api/dashboard/projects/addDeleteUser", {projectId: idCurrentProject, userId: userId})
       if (addUser.status == 200){
         setUsersOfProject(addUser.data.users)
         console.log(addUser)
-        toast.success('Клиент добавлен в проект!');
+        toast.success('Работник добавлен в проект!');
       }
     } catch (error) {
       toast(`${error}`)
@@ -49,7 +49,7 @@ const Page = () => {
       })
       if (deleteUser.status == 200){
         setUsersOfProject(prev => prev.filter(user => user.id != userId))
-        toast.success('Клиент удален из проекта!');
+        toast.success('Работник удален из проекта!');
       }
     } catch (error) {
       toast(`${error}`)
