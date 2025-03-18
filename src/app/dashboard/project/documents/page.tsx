@@ -60,7 +60,7 @@ const Page = () => {
     return (
       <div>
           <div className="p-4">
-            <h1 className="mb-4 font-bold text-gold text-2xl">Клиенты Проекта</h1>
+            <h1 className="mb-4 font-bold text-gold text-2xl">Документы</h1>
             <table className="bg-white border border-gray-300 min-w-full">
               <thead>
                 <tr>

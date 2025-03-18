@@ -113,10 +113,19 @@ model Document {
   createdAt DateTime @default(now())
 }
 
-
+model IFC {
+  id        String   @id @default(cuid())
+  name      String
+  title     String
+  path      String   @unique
+  projectId String   @unique
+  createdAt DateTime @default(now())
+}
 
 enum TaskStatus {
   TODO
   IN_PROGRESS
   DONE
 }
+
+

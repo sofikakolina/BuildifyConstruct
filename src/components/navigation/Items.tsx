@@ -10,6 +10,7 @@ export const AdminMenuItems = [
     { text: 'Сообщения', path: `messages` },
     { text: 'Клиенты', path: `clients` },
     { text: 'Команда проекта', path: `team` },
+    { text: 'IFC', path: `ifc` },
     { text: 'Документы', path: `documents` },
     { text: 'Платежные документы', path: `payments` },
     { text: 'Материалы', path: `materials` },
