@@ -68,7 +68,7 @@ export const KanbanProvider = ({ children }) => {
 
 				setData(newData)
 			} catch (error) {
-				toast.error("Ошибка при загрузке задач")
+				toast.error(`{Ошибка при загрузке задач, ${error}}`)
 			}
 		}
 		fetchData()
