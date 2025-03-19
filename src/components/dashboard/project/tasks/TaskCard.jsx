@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
 	Paper,
 	Box,
@@ -11,14 +11,13 @@ import {
 	TextField,
 	Popover,
 	Avatar,
-	Skeleton,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import CommentIcon from "@mui/icons-material/Comment";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+// import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
+// import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+// import CommentIcon from "@mui/icons-material/Comment";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
 import Link from "next/link";
 import dayjs from "dayjs";
 import OrderModal from "./OrderModal";
@@ -77,36 +76,36 @@ const TaskCard = ({ task, session, staff }) => {
 	const handleOpenOrderModal = () => setOpenOrderModal(true);
 	const handleCloseOrderModal = () => setOpenOrderModal(false);
 
-	const ImageWithSkeleton = ({ src, alt }) => {
-		const [imageLoading, setImageLoading] = useState(true);
-		const imgRef = useRef();
+	// const ImageWithSkeleton = ({ src, alt }) => {
+	// 	const [imageLoading, setImageLoading] = useState(true);
+	// 	const imgRef = useRef();
 
-		useEffect(() => {
-			if (imgRef.current && imgRef.current.complete) {
-				setImageLoading(false);
-			}
-		}, [src]);
+	// 	useEffect(() => {
+	// 		if (imgRef.current && imgRef.current.complete) {
+	// 			setImageLoading(false);
+	// 		}
+	// 	}, [src]);
 
-		return (
-			<>
-				{imageLoading && (
-					<Skeleton variant="rectangular" width="100%" height={175} />
-				)}
-				<img
-					ref={imgRef}
-					src={src}
-					alt={alt}
-					style={{
-						display: imageLoading ? "none" : "block",
-						maxWidth: "200px",
-						padding: "10px",
-					}}
-					onLoad={() => setImageLoading(false)}
-					className="rounded proofingImage"
-				/>
-			</>
-		);
-	};
+	// 	return (
+	// 		<>
+	// 			{imageLoading && (
+	// 				<Skeleton variant="rectangular" width="100%" height={175} />
+	// 			)}
+	// 			<img
+	// 				ref={imgRef}
+	// 				src={src}
+	// 				alt={alt}
+	// 				style={{
+	// 					display: imageLoading ? "none" : "block",
+	// 					maxWidth: "200px",
+	// 					padding: "10px",
+	// 				}}
+	// 				onLoad={() => setImageLoading(false)}
+	// 				className="rounded proofingImage"
+	// 			/>
+	// 		</>
+	// 	);
+	// };
 
 	return (
 		<Paper>

@@ -19,9 +19,9 @@ interface StaffMember {
   role: string;
 }
 
-interface StaffResponse {
-  staff: StaffMember[];
-}
+// interface StaffResponse {
+//   staff: StaffMember[];
+// }
 
 const KanbanBoardComponent = ({ session }: KanbanBoardComponentProps) => {
   const { data, onDragEnd } = useKanban();

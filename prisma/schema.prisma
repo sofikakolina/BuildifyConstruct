@@ -129,7 +129,7 @@ model Task {
   updatedAt        DateTime          @updatedAt
   assignedStaff    User[]            @relation("AssignedTasks")
   startDate        DateTime          @default(now())
-  targetEnd        DateTime      
+  targetEnd        DateTime?      
 }
 
 
