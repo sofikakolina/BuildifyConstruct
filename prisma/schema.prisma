@@ -51,11 +51,11 @@ model User {
   updatedAt      DateTime   @updatedAt
   firstName      String
   lastName       String
-  accounts      Account[]
-  sessions      Session[]
+  accounts       Account[]
+  sessions       Session[]
   nickName       String?    @unique
   email          String?    @unique
-  emailVerified  DateTime? @map("email_verified")
+  emailVerified  DateTime?  @map("email_verified")
   hashedPassword String?
   image          String?
   role           Role       @default(Executer)
@@ -63,8 +63,9 @@ model User {
 
   VerificationToken VerificationToken[]
   
-  projectId String[]
-  project Project[] @relation("UserProjects")
+  projectId      String[]
+  project        Project[] @relation("UserProjects")
+  tasks          Task[]    @relation("AssignedTasks")
 }
 
  
@@ -96,14 +97,6 @@ model Project {
   documents Document[] // Документы, привязанные к проекту
 }
 
-
-
-enum JobStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-}
-
 model Document {
   id        String   @id @default(cuid())
   title     String
@@ -122,6 +115,24 @@ model IFC {
   createdAt DateTime @default(now())
 }
 
+model Task {
+  id               String               @id @default(cuid())
+  userId           String?
+  projectId String?
+  status           TaskStatus       @default(Todo)
+  priority         OrderPriority     @default(Normal)
+  name             String
+  details          String?
+  image     String?
+  comment   String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  assignedStaff    User[]            @relation("AssignedTasks")
+  startDate        DateTime          @default(now())
+  targetEnd        DateTime      
+}
+
+
 enum TaskStatus {
   Todo
   Pause
@@ -130,4 +141,7 @@ enum TaskStatus {
   Done
 }
 
-
+enum OrderPriority {
+  Normal
+  Rush
+}

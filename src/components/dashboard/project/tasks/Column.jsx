@@ -19,7 +19,7 @@ const Column = ({ columnId, column, session, staff }) => {
 		}}>
 			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: '15px', pt: '15px' }}>
 				<Typography variant="h6" sx={{ fontSize: '16px' }}>{column.title}</Typography>
-				<Typography variant="h6" sx={{ fontSize: '12px' }}>{column.orders.length}</Typography>
+				<Typography variant="h6" sx={{ fontSize: '12px' }}>{column.tasks.length}</Typography>
 			</Box>
 			<Droppable droppableId={columnId}>
 				{(provided) => (
@@ -35,8 +35,8 @@ const Column = ({ columnId, column, session, staff }) => {
 							display: 'flex', flexDirection: 'column',
 						}}
 					>
-						{column.orders.map((order, index) => (
-							<Draggable key={order.id} draggableId={order.id} index={index}>
+						{column.tasks.map((task, index) => (
+							<Draggable key={task.id} draggableId={task.id} index={index}>
 								{(provided) => (
 									<Box
 										ref={provided.innerRef}
@@ -44,7 +44,7 @@ const Column = ({ columnId, column, session, staff }) => {
 										{...provided.dragHandleProps}
 										sx={{ mb: '8px' }}
 									>
-										<TaskCard order={order} session={session} staff={staff}/>
+										<TaskCard task={task} session={session} staff={staff}/>
 									</Box>
 								)}
 							</Draggable>

@@ -27,9 +27,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useKanban } from "./KanbanContext";
 
-const TaskCard = ({ order, session, staff }) => {
+const TaskCard = ({ task, session, staff }) => {
+	console.log(task)
 	const { data, updateData } = useKanban();
-	const [priority, setPriority] = useState(order.priority || "");
+	const [priority, setPriority] = useState(task.priority || "");
 	const [anchorElDate, setAnchorElDate] = useState(null);
 	const [openOrderModal, setOpenOrderModal] = useState(false);
 
@@ -39,14 +40,14 @@ const TaskCard = ({ order, session, staff }) => {
 		const newPriority = event.target.value;
 		try {
 			await axios.post("/api/editOrder", {
-				id: order.id,
+				id: task.id,
 				priority: newPriority,
 			});
 			setPriority(newPriority);
 
-			const updatedOrder = { ...order, priority: newPriority };
+			const updatedOrder = { ...task, priority: newPriority };
 			const columnIndex = data.columnOrder.findIndex((col) =>
-				data.columns[col].orders.some((o) => o.id === order.id)
+				data.columns[col].orders.some((o) => o.id === task.id)
 			);
 			const orderIndex = data.columns[
 				data.columnOrder[columnIndex]
@@ -60,12 +61,12 @@ const TaskCard = ({ order, session, staff }) => {
 	};
 
 	const formattedDate = useMemo(
-		() => dayjs(order.payment.dueDate).format("ddd, MM/DD"),
-		[order.payment.dueDate]
+		() => dayjs(task.targetEnd).format("ddd, MM/DD"),
+		[task.targetEnd]
 	);
 	const formattedDateCreated = useMemo(
-		() => dayjs(order.payment.createdAt).format("ddd, MM/DD"),
-		[order.payment.createdAt]
+		() => dayjs(task.startDate).format("ddd, MM/DD"),
+		[task.startDate]
 	);
 
 	const handleOpenDatePopover = (event) =>
@@ -110,14 +111,14 @@ const TaskCard = ({ order, session, staff }) => {
 	return (
 		<Paper>
 			<Box className="flex flex-col gap-5 orderPreview">
-				{order?.proofs.length > 0 ? (
+				{/* {task?.proofs.length > 0 ? (
 					<Box className="proofingPreview">
 						<a
 							onClick={handleOpenOrderModal}
 							className="cursor-pointer"
 						>
 							<figure className="relative flex justify-center">
-								{order.proofs.slice(-1).map((i) =>
+								{task.proofs.slice(-1).map((i) =>
 									i.assets && i.assets.length > 0 ? (
 										<ImageWithSkeleton
 											key={i.id}
@@ -133,7 +134,7 @@ const TaskCard = ({ order, session, staff }) => {
 											sx={{ fontSize: "1rem" }}
 											className="text-white"
 										/>
-										{order.proofs.reduce(
+										{task.proofs.reduce(
 											(sum, proof) =>
 												sum + proof.messages.length,
 											0
@@ -144,12 +145,12 @@ const TaskCard = ({ order, session, staff }) => {
 											sx={{ fontSize: "1rem" }}
 											className="text-white"
 										/>
-										{order.proofs.reduce(
+										{task.proofs.reduce(
 											(sum, proof) => sum + proof.views,
 											0
 										)}
 									</span>
-									{order?.proofs.some(
+									{task?.proofs.some(
 										(proof) => proof.accepted
 									) ? (
 										<span>
@@ -177,17 +178,17 @@ const TaskCard = ({ order, session, staff }) => {
 							className="cursor-pointer"
 						>
 							<figure className="relative flex justify-center">
-								{order.orderItems.length > 0 && (
+								{task.orderItems.length > 0 && (
 									<ImageWithSkeleton
-										key={order.orderItems[0].id}
-										src={order.orderItems[0].image}
+										key={task.orderItems[0].id}
+										src={task.orderItems[0].image}
 										alt="Order item image"
 									/>
 								)}
 							</figure>
 						</a>
 					</Box>
-				)}
+				)} */}
 				<Box
 					sx={{
 						mt: 2,
@@ -201,21 +202,21 @@ const TaskCard = ({ order, session, staff }) => {
 						onClick={handleOpenOrderModal}
 						className="font-bold hover:text-primary text-sm hover:underline cursor-pointer"
 					>
-						ORD #{order.id}
+						ORD #{task.id}
 					</button>
 					<Link
-						href={"/dashboard/users/" + order.user.id}
+						href={"/dashboard/users/" + task.id}
 						className="font-bold hover:text-primary text-sm hover:underline"
 					>
-						{order?.user.company}
+						{task?.id}
 					</Link>
-					<Typography className="bg-primary px-2 py-1 rounded-md font-bold text-white text-sm quantity">
+					{/* <Typography className="bg-primary px-2 py-1 rounded-md font-bold text-white text-sm quantity">
 						Qty:{" "}
-						{order.orderItems.reduce(
+						{task.orderItems.reduce(
 							(sum, item) => sum + item.quantity,
 							0
 						)}
-					</Typography>
+					</Typography> */}
 				</Box>
 				<Box
 					className="orderSummary"
@@ -287,10 +288,10 @@ const TaskCard = ({ order, session, staff }) => {
 								>
 									<DatePicker
 										label="Due Date"
-										value={dayjs(order.payment.dueDate)}
+										value={dayjs(task.targetEnd)}
 										onChange={(newValue) => {
 											if (newValue) {
-												updateData(order.id, newValue);
+												updateData(task.id, newValue);
 											}
 										}}
 										renderInput={(params) => (
@@ -311,13 +312,13 @@ const TaskCard = ({ order, session, staff }) => {
 							gap: "5px",
 						}}
 					>
-						{order.staffAssignments.length > 0 &&
-							order.staffAssignments.map((assignment) => (
+						{task.assignedStaff.length > 0 &&
+							task.assignedStaff.map((assignment) => (
 								<Avatar
-									key={assignment.employee.id}
+									key={assignment.id}
 									sx={{ width: "30px", height: "30px" }}
 									alt="Team"
-									src={assignment.employee.image}
+									src={assignment.image}
 								/>
 							))}
 					</Box>
@@ -326,7 +327,7 @@ const TaskCard = ({ order, session, staff }) => {
 			{staff && (
 				<OrderModal
 					session={session}
-					order={order}
+					task={task}
 					formatDate={formatDate}
 					openOrder={openOrderModal}
 					priority={priority}

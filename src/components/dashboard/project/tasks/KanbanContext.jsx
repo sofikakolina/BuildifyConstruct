@@ -2,55 +2,45 @@
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useAppSelector } from '@/lib/hooks'
 
 const initialData = {
 	columns: {
-		'orders': {
-			id: 'orders',
-			title: 'Orders',
-			orders: [],
+		'todo': {
+			id: 'todo',
+			title: 'К выполнению',
+			tasks: [],
 		},
-		'design': {
-			id: 'design',
-			title: 'Design',
-			orders: [],
+		'pause': {
+			id: 'pause',
+			title: 'Пауза',
+			tasks: [],
 		},
-		// 'proofing': {
-		// 	id: 'proofing',
-		// 	title: 'Proofing',
-		// 	orders: [],
-		// },
-		'prepress': {
-			id: 'prepress',
-			title: 'Prepress',
-			orders: [],
+		'inProgress': {
+			id: 'inProgress',
+			title: 'В работе',
+			tasks: [],
 		},
-		'production': {
-			id: 'production',
-			title: 'Production',
-			orders: [],
+		'wait': {
+			id: 'wait',
+			title: 'Ожидание',
+			tasks: [],
 		},
-		'hold': {
-			id: 'hold',
-			title: 'Hold',
-			orders: [],
-		},
-		'completed': {
-			id: 'completed',
-			title: 'Complete Orders',
-			orders: [],
+		'done': {
+			id: 'done',
+			title: 'Выполнено',
+			tasks: [],
 		},
 	},
-	columnOrder: ['orders', 'design', 'prepress', 'production', 'hold', 'completed'],
+	columnTask: ['todo', 'pause', 'inProgress', 'wait', 'done'],
 };
 
-
 const lookupTable = {
-	orders: "Todo",
-	design: "Pause",
-	prepress: "InProgress",
-	production: "Wait",
-	hold: "Done",
+	todo: "Todo",
+	pause: "Pause",
+	inProgress: "InProgress",
+	wait: "Wait",
+	done: "Done",
 };
 
 const KanbanContext = createContext();
@@ -59,23 +49,35 @@ export const useKanban = () => useContext(KanbanContext);
 
 export const KanbanProvider = ({ children }) => {
 	const [data, setData] = useState(initialData);
+	const idCurrentProject = useAppSelector(state => state.idCurrentProject.value)
 	useEffect(() => {
-		axios.post("/api/getJobs").then(({ jobs }) => {
-			const newData = { ...initialData }
-			Object.keys(newData.columns).forEach(column => {
-				if (jobs[column]) {  // Check if jobs[column] is actually defined
-					jobs[column] = jobs[column].map(job => ({ ...job, id: job.id.toString() }));
-					newData.columns[column].orders = jobs[column];
-				}
-			});
-			setData(newData)
-		}).catch(() => toast.error("Failed to load jobs"))
-	}, [])
+		const fetchData = async() => {
+			try{
+				const tasks = (await axios.get(`/api/dashboard/projects/tasks`, {
+					params: {
+						projectId: idCurrentProject
+					}
+				})).data.tasks
+				const newData = { ...initialData }
+				Object.keys(newData.columns).forEach(column => {
+					if (tasks[column]) {  // Check if jobs[column] is actually defined
+						tasks[column] = tasks[column].map(job => ({ ...job, id: job.id.toString() }));
+						newData.columns[column].tasks = tasks[column];
+					}
+				});
+
+				setData(newData)
+			} catch (error) {
+				toast.error("Ошибка при загрузке задач")
+			}
+		}
+		fetchData()
+	}, [idCurrentProject])
 	const moveTask = (data, sourceColumnId, destColumnId, sourceIndex, destIndex) => {
 		const startColumn = data.columns[sourceColumnId];
 		const finishColumn = data.columns[destColumnId];
-		const sourceTasks = Array.from(startColumn.orders);
-		const destTasks = destColumnId === sourceColumnId ? sourceTasks : Array.from(finishColumn.orders);
+		const sourceTasks = Array.from(startColumn.tasks);
+		const destTasks = destColumnId === sourceColumnId ? sourceTasks : Array.from(finishColumn.tasks);
 		const [removedTask] = sourceTasks.splice(sourceIndex, 1);
 
 		// Update the status of the task based on the destination column
@@ -90,11 +92,11 @@ export const KanbanProvider = ({ children }) => {
 				...data.columns,
 				[sourceColumnId]: {
 					...startColumn,
-					orders: sourceTasks,
+					tasks: sourceTasks,
 				},
 				[destColumnId]: {
 					...finishColumn,
-					orders: destTasks,
+					tasks: destTasks,
 				},
 			},
 		};
@@ -112,8 +114,8 @@ export const KanbanProvider = ({ children }) => {
 
 		try {
 			await axios.post("/api/editOrder", {
-				id: newData.columns[destination.droppableId].orders[destination.index].id,
-				status: newData.columns[destination.droppableId].orders[destination.index].status
+				id: newData.columns[destination.droppableId].tasks[destination.index].id,
+				status: newData.columns[destination.droppableId].tasks[destination.index].status
 			});
 		} catch (error) {
 			toast.error(error.message);
@@ -128,10 +130,10 @@ export const KanbanProvider = ({ children }) => {
 			const newData = { ...prevData };
 			if (columnId && newData.columns.hasOwnProperty(columnId)) {
 				const column = newData.columns[columnId];
-				const newOrders = [...column.orders];
+				const newOrders = [...column.tasks];
 				if (index >= 0 && index < newOrders.length) {
 					newOrders[index] = updatedOrder;
-					newData.columns[columnId] = { ...column, orders: newOrders };
+					newData.columns[columnId] = { ...column, tasks: newOrders };
 				} else {
 					console.error("Index out of bounds while trying to update order in column:", columnId);
 				}
@@ -149,7 +151,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders = newData.columns[columnKey].orders.map(order => {
+				newData.columns[columnKey].tasks = newData.columns[columnKey].tasks.map(order => {
 					if (order.id === orderId) {
 						return {
 							...order,
@@ -167,7 +169,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders = newData.columns[columnKey].orders.map(order => {
+				newData.columns[columnKey].tasks = newData.columns[columnKey].tasks.map(order => {
 					if (order.id === orderId) {
 						return { ...order, tasks: [...order.tasks, newTask] };
 					}
@@ -182,7 +184,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders = newData.columns[columnKey].orders.map(order => {
+				newData.columns[columnKey].tasks = newData.columns[columnKey].tasks.map(order => {
 					if (order.id === orderId) {
 						return { ...order, tasks: order.tasks.filter(task => task.id !== taskId) };
 					}
@@ -198,7 +200,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						order.proofs = [...order.proofs, newProof];
 					}
@@ -212,7 +214,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						const proofIndex = order.proofs.findIndex(proof => proof.id === proofId);
 						if (proofIndex !== -1) {
@@ -229,7 +231,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						order.proofs = order.proofs.filter(proof => proof.id !== proofId);
 					}
@@ -243,7 +245,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						order.assets = [...order.assets, newAsset];
 					}
@@ -257,7 +259,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						order.assets = order.assets.filter(asset => asset.id !== assetId);
 					}
@@ -283,7 +285,7 @@ export const KanbanProvider = ({ children }) => {
 
 				// Find the current column and index of the order
 				Object.keys(newData.columns).forEach(columnId => {
-					const index = newData.columns[columnId].orders.findIndex(order => order.id === orderId);
+					const index = newData.columns[columnId].tasks.findIndex(order => order.id === orderId);
 					if (index > -1) {
 						sourceColumnId = columnId;
 						sourceIndex = index;
@@ -292,16 +294,16 @@ export const KanbanProvider = ({ children }) => {
 
 				// Destination column is based on the new status
 				destColumnId = columnKey;
-				// destIndex = newData.columns[destColumnId].orders.length; // Add to the end of the list in the new column
+				// destIndex = newData.columns[destColumnId].tasks.length; // Add to the end of the list in the new column
 
 				// Remove from the current column
-				const [removedOrder] = newData.columns[sourceColumnId].orders.splice(sourceIndex, 1);
+				const [removedOrder] = newData.columns[sourceColumnId].tasks.splice(sourceIndex, 1);
 
 				// Set the new status
 				removedOrder.status = newStatus;
 
 				// Add to the destination column
-				newData.columns[destColumnId].orders.push(removedOrder);
+				newData.columns[destColumnId].tasks.push(removedOrder);
 
 				return newData;
 			});
@@ -318,7 +320,7 @@ export const KanbanProvider = ({ children }) => {
 			setData(prevData => {
 				const newData = { ...prevData };
 				Object.keys(newData.columns).forEach(columnKey => {
-					newData.columns[columnKey].orders = newData.columns[columnKey].orders.map(order => {
+					newData.columns[columnKey].tasks = newData.columns[columnKey].tasks.map(order => {
 						if (order.id === orderId) {
 							return { ...order, dueDate: newDueDate.toISOString() };
 						}
@@ -337,14 +339,14 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			const columnKey = Object.keys(newData.columns).find(key =>
-				newData.columns[key].orders.some(order => order.id === orderId)
+				newData.columns[key].tasks.some(order => order.id === orderId)
 			);
 			if (columnKey) {
-				const orderIndex = newData.columns[columnKey].orders.findIndex(order => order.id === orderId);
+				const orderIndex = newData.columns[columnKey].tasks.findIndex(order => order.id === orderId);
 				if (orderIndex !== -1) {
-					const order = newData.columns[columnKey].orders[orderIndex];
+					const order = newData.columns[columnKey].tasks[orderIndex];
 					order.staffAssignments = [...order.staffAssignments, { role, employee }];
-					newData.columns[columnKey].orders[orderIndex] = order;
+					newData.columns[columnKey].tasks[orderIndex] = order;
 				}
 			}
 			return newData;
@@ -355,7 +357,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(prevData => {
 			const newData = { ...prevData };
 			Object.keys(newData.columns).forEach(columnKey => {
-				newData.columns[columnKey].orders.forEach(order => {
+				newData.columns[columnKey].tasks.forEach(order => {
 					if (order.id === orderId) {
 						order.staffAssignments = order.staffAssignments.filter(assignment => assignment.employee.id !== employeeId);
 					}
