@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Получаем все проекты из базы данных
+    // Получаем всех работников из базы данных
     const team = await prisma.user.findMany({
       where: {
         role: {

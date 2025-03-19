@@ -18,17 +18,17 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import GeneratePdf from "./GeneratePdf";
 
-export default function OrderModal({ session, order, openOrder, handleCloseOrder, priority, setPriority, formatDate, staff, data, updateData }) {
+export default function OrderModal({ session, task, openOrder, handleCloseOrder, priority, setPriority, formatDate, staff, data, updateData }) {
 
 	const handleChange = async event => {
 		const newPriority = event.target.value;
 		try {
-			await axios.post("/api/editOrder", { id: order.id, priority: newPriority });
+			await axios.post("/api/editOrder", { id: task.id, priority: newPriority });
 			setPriority(newPriority);
 
-			const updatedOrder = { ...order, priority: newPriority };
-			const columnIndex = data.columnOrder.findIndex(col => data.columns[col].orders.some(o => o.id === order.id));
-			const orderIndex = data.columns[data.columnOrder[columnIndex]].orders.findIndex(o => o.id === order.id);
+			const updatedOrder = { ...task, priority: newPriority };
+			const columnIndex = data.columnOrder.findIndex(col => data.columns[col].orders.some(o => o.id === task.id));
+			const orderIndex = data.columns[data.columnOrder[columnIndex]].orders.findIndex(o => o.id === task.id);
 			updateData(data.columnOrder[columnIndex], orderIndex, updatedOrder);
 
 			toast.success("Priority updated successfully");
@@ -78,8 +78,8 @@ export default function OrderModal({ session, order, openOrder, handleCloseOrder
 							<Grid item xs={9}>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 									<Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', gap:"15px" }}>
-										<GeneratePdf order={order} />
-										<Link href={`/dashboard/jobs/${order.id}`}>
+										<GeneratePdf task={task} />
+										<Link href={`/dashboard/jobs/${task.id}`}>
 											<IconButton
 												aria-label="edit"
 												sx={{
@@ -99,7 +99,7 @@ export default function OrderModal({ session, order, openOrder, handleCloseOrder
 										</Link>
 									</Box>
 									<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-										<Typography variant="h4">ORD #{order.id}</Typography>
+										<Typography variant="h4">ORD #{task.id}</Typography>
 										<Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
 											<FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 												<InputLabel id="priority">Priority</InputLabel>
@@ -114,23 +114,22 @@ export default function OrderModal({ session, order, openOrder, handleCloseOrder
 													<MenuItem value={OrderPriority.Rush}>{OrderPriority.Rush}</MenuItem>
 												</Select>
 											</FormControl>
-											<Typography className="bg-primary px-2 py-2 rounded-md font-bold text-white text-sm quantity">Qty: {order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}</Typography>
 										</Box>
 
 									</Box>
-									<OrderDetails order={order} userRole={session.user.role}/>
-									{/*<Proofing session={session} formatDate={formatDate} order={order} />*/}
-									<DetailsTextarea order={order} />
-									<Tasks formatDate={formatDate} order={order} />
-									<Assets order={order} />
+									<OrderDetails task={task} userRole={session.user.role}/>
+									{/*<Proofing session={session} formatDate={formatDate} task={task} />*/}
+									<DetailsTextarea task={task} />
+									<Tasks formatDate={formatDate} task={task} />
+									<Assets task={task} />
 								</Box>
 							</Grid>
 							<Grid item xs={3}>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-									<Customer order={order} />
-									<Status formatDate={formatDate} order={order} data={data} />
-									<TeamAssigment order={order} staff={staff} />
-									<ShippingAddresses order={order} />
+									<Customer task={task} />
+									<Status formatDate={formatDate} task={task} data={data} />
+									<TeamAssigment task={task} staff={staff} />
+									<ShippingAddresses task={task} />
 								</Box>
 							</Grid>
 						</Grid>

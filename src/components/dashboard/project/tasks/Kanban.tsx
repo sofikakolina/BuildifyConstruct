@@ -7,6 +7,7 @@ import Column from './Column';
 import Link from 'next/link';
 import axios from 'axios';
 import { Session } from "next-auth";
+import { useAppSelector } from '@/lib/hooks';
 
 interface KanbanBoardComponentProps {
   session: Session | null; // Тип для session
@@ -24,13 +25,24 @@ interface StaffResponse {
 
 const KanbanBoardComponent = ({ session }: KanbanBoardComponentProps) => {
   const { data, onDragEnd } = useKanban();
-  const totalTasks = data.columnOrder.reduce((acc: number, columnId: string) => acc + data.columns[columnId].orders.length, 0);
+  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value)
+  // console.log("Data", data)
+  // const totalTasks = data.columns.reduce((acc: number, columnId: string) => acc + data.columns[columnId].orders.length, 0);
+  const totalTasks = data.columns.todo.tasks.length + data.columns.pause.tasks.length + data.columns.inProgress.tasks.length + data.columns.wait.tasks.length + data.columns.done.tasks.length;
   const [staff, setStaff] = useState<StaffMember[]>([]); // Укажите тип для состояния `staff`
   useEffect(() => {
-    axios.get<StaffResponse>("/api/getStaff")
-      .then((response) => setStaff(response.data.staff))
-      .catch((error) => console.error("Ошибка при загрузке staff:", error));
-  }, []);  return (
+    const fetchData = async() => {
+      try{
+        const usersOfProject = await axios.post("/api/dashboard/projects/team", {idCurrentProject: idCurrentProject})
+        setStaff(usersOfProject.data)
+      } catch(error) {
+        console.error("Ошибка при загрузке staff:", error)
+      }
+    }
+    fetchData()
+  }, [idCurrentProject]);  
+  
+  return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingX: '20px' }}>
         <Typography variant='h4' className='flex items-center gap-1'>
@@ -43,7 +55,7 @@ const KanbanBoardComponent = ({ session }: KanbanBoardComponentProps) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'hidden' }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Box sx={{ display: 'flex', flexGrow: 1, my: 2 }}>
-            {data.columnOrder.map((columnId: string) => {
+            {data.columnTask.map((columnId: string) => {
               const column = data.columns[columnId];
               return (
                 <Column key={column.id} columnId={column.id} column={column} session={session} staff={staff} />
