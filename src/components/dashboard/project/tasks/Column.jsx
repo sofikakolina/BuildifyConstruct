@@ -19,7 +19,7 @@ const Column = ({ columnId, column, session, staff }) => {
 		}}>
 			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: '15px', pt: '15px' }}>
 				<Typography variant="h6" sx={{ fontSize: '16px' }}>{column.title}</Typography>
-				<Typography variant="h6" sx={{ fontSize: '12px' }}>{column.tasks.length}</Typography>
+				<Typography variant="h6" sx={{ fontSize: '12px' }}>({column.tasks.length})</Typography>
 			</Box>
 			<Droppable droppableId={columnId}>
 				{(provided) => (

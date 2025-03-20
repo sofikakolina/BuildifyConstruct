@@ -6,10 +6,10 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useKanban } from './KanbanContext';
 
-export default function DetailsTextarea({ order }) {
+export default function DetailsTextarea({ task }) {
 	const { data, updateData } = useKanban();
 	const [isEditing, setIsEditing] = useState(false);
-	const [text, setText] = useState(order.details || '');
+	const [text, setText] = useState(task.details || '');
 
 
 	const handleEdit = () => {
@@ -18,13 +18,13 @@ export default function DetailsTextarea({ order }) {
 
 	const handleSave = async () => {
 		try {
-			await axios.post("/api/editOrder", { id: order.id, details: text });
-			const updatedOrder = { ...order, details: text };
-			const columnIndex = data.columnOrder.findIndex(col => data.columns[col].orders.some(o => o.id === order.id));
-			const orderIndex = data.columns[data.columnOrder[columnIndex]].orders.findIndex(o => o.id === order.id);
-			updateData(data.columnOrder[columnIndex], orderIndex, updatedOrder);
+			await axios.post("/api/dashboard/projects/tasks", { id: task.id, details: text });
+			const updatedOrder = { ...task, details: text };
+			const columnIndex = data.columnTask.findIndex(col => data.columns[col].tasks.some(o => o.id === task.id));
+			const orderIndex = data.columns[data.columnTask[columnIndex]].tasks.findIndex(o => o.id === task.id);
+			updateData(data.columnTask[columnIndex], orderIndex, updatedOrder);
 	
-			toast.success("Details saved successfully");
+			toast.success("Детали успешно сохранены!");
 			setIsEditing(false);
 		} catch (error) {
 			toast.error(error.message);
@@ -38,7 +38,7 @@ export default function DetailsTextarea({ order }) {
 
 	return (
 		<Box>
-			<Typography sx={{ fontWeight: 'bold', mb: 2 }} variant='body1'>Details</Typography>
+			<Typography sx={{ fontWeight: 'bold', mb: 2 }} variant='body1'>Детали</Typography>
 			<Paper elevation={2} sx={{ p: 2, minHeight: '150px' }}>
 				{!isEditing ? (
 					<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
