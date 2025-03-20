@@ -41,7 +41,7 @@ type Tasks = {
 
 
 
-  export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");
@@ -167,3 +167,28 @@ type Tasks = {
 
     return NextResponse.json({ tasks });
 }
+
+
+export async function POST(request: Request) {
+    try {
+      const { id, ...updateData } = await request.json(); // Извлекаем id и оставляем остальные поля динамическими
+  
+      if (!id) {
+        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      }
+  
+      const updatedProject = await prisma.task.update({
+        where: { id },
+        data: updateData, // Передаём все остальные поля в data
+      });
+  
+      return NextResponse.json(updatedProject, { status: 200 });
+    } catch (error) {
+      console.error("Error updating task:", error);
+      return NextResponse.json(
+        { error: "Failed to update task" },
+        { status: 500 }
+      );
+    }
+  }
+  

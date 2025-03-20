@@ -45,11 +45,11 @@ const KanbanBoardComponent = ({ session }: KanbanBoardComponentProps) => {
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingX: '20px' }}>
-        <Typography variant='h4' className='flex items-center gap-1'>
-          Jobs<span className='text-sm'>({totalTasks})</span>
+        <Typography variant='h4' className='flex items-center gap-1 text-gold'>
+          Задачи<span className='text-sm'>({totalTasks})</span>
         </Typography>
-        <Link href={"/dashboard/jobs/create"} className='font-bold hover:text-primary text-sm hover:underline'>
-          <Button variant="contained" sx={{ color: 'white', backgroundColor: 'primary.main' }}>Add new</Button>
+        <Link href={"/dashboard/project/tasks/create"} className='font-bold hover:text-primary text-sm hover:underline'>
+          <Button variant="contained" sx={{ color: 'white', backgroundColor: '#f69220' }}>Создать задачу</Button>
         </Link>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'hidden' }}>

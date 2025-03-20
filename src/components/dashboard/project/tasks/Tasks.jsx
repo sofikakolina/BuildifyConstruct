@@ -1,50 +1,47 @@
 'use client'
-import { Box, Typography, IconButton, Button, Paper, Divider, Avatar, Checkbox } from '@mui/material';
+import { Box, Typography, Button, Paper } from '@mui/material';
 import { useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import { grey } from '@mui/material/colors';
 import TaskFormComponent from './TaskForm';
-import { Delete } from '@mui/icons-material';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useKanban } from './KanbanContext';  // Используем KanbanContext
 
-export default function Tasks({ formatDate, order }) {
-    const [editingTaskId, setEditingTaskId] = useState(null);
+export default function Tasks({ /*formatDate*/ task }) {
+    // const [editingTaskId, setEditingTaskId] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const { updateTask, addTask, removeTask } = useKanban();
+    const { addTask } = useKanban();
 
-    const tasks = order.tasks;  
+    // const tasks = task.tasks;  
 
-    const startEditTask = (taskId) => {
-        console.log("starting")
-        setEditingTaskId(taskId);
-    };
+    // const startEditTask = (taskId) => {
+    //     console.log("starting")
+    //     setEditingTaskId(taskId);
+    // };
 
-    const saveEditedTask = async task => {
-        if (!task.description) task.description = null;
-        try {
-            await axios.post("/api/editTask", {
-                id: task.id, title: task.title, description: task.description,
-                assigneeId: task.assigneeId, dueDate: task.dueDate, done: task.done
-            });
-            updateTask(order.id, task.id, task); 
-            setEditingTaskId(null);
-        } catch (error) {
-            toast.error(error.message);
-        }
-    };
+    // const saveEditedTask = async task => {
+    //     if (!task.description) task.description = null;
+    //     try {
+    //         await axios.post("/api/editTask", {
+    //             id: task.id, title: task.title, description: task.description,
+    //             assigneeId: task.assigneeId, dueDate: task.dueDate, done: task.done
+    //         });
+    //         updateTask(task.id, task.id, task); 
+    //         setEditingTaskId(null);
+    //     } catch (error) {
+    //         toast.error(error.message);
+    //     }
+    // };
 
 	const saveNewTask = async task => {
 		if (!task.description) delete task.description;
 		try {
 			const response = await axios.post("/api/createTask", {
-				orderId: order.id, title: task.title, description: task.description,
+				orderId: task.id, title: task.title, description: task.description,
 				dueDate: task.dueDate, assigneeId: task.assignee.id
 			});
 			if (response && response.task && response.task.id) {
 				const newTaskWithId = { ...task, id: response.task.id }; 
-				addTask(order.id, newTaskWithId);
+				addTask(task.id, newTaskWithId);
 				setShowCreateForm(false);
 			} else {
 				throw new Error("Failed to receive task ID from the server");
@@ -56,33 +53,33 @@ export default function Tasks({ formatDate, order }) {
 	
 
 
-    const handleDeleteTask = async taskId => {
-        try {
-            await axios.post("/api/deleteTask", { id: taskId });
-            removeTask(order.id, taskId); 
-        } catch (error) {
-            toast.error(error.message);
-        }
-    };
+    // const handleDeleteTask = async taskId => {
+    //     try {
+    //         await axios.post("/api/deleteTask", { id: taskId });
+    //         removeTask(task.id, taskId); 
+    //     } catch (error) {
+    //         toast.error(error.message);
+    //     }
+    // };
 
-    const handleToggleDone = async taskId => {
-        const task = tasks.find(t => t.id === taskId);
-        if (task) {
-            const updatedTask = { ...task, done: !task.done };
-            try {
-                await axios.post("/api/editTask", { id: taskId, done: !task.done });
-                updateTask(order.id, taskId, updatedTask); 
-            } catch (error) {
-                toast.error(error.message);
-            }
-        }
-    };
+    // const handleToggleDone = async taskId => {
+    //     const task = tasks.find(t => t.id === taskId);
+    //     if (task) {
+    //         const updatedTask = { ...task, done: !task.done };
+    //         try {
+    //             await axios.post("/api/editTask", { id: taskId, done: !task.done });
+    //             updateTask(task.id, taskId, updatedTask); 
+    //         } catch (error) {
+    //             toast.error(error.message);
+    //         }
+    //     }
+    // };
 
 	
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
 			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-				<Typography sx={{ fontWeight: 'bold', mb: 2 }} variant='body1'>Tasks({tasks.filter(task => task.done).length} / {tasks.length})</Typography>
+				<Typography sx={{ fontWeight: 'bold', mb: 2 }} variant='body1'>Tasks {/*({tasks.filter(task => task.done).length} / {tasks.length})*/}</Typography>
 				<Box sx={{ display: 'flex', gap: 2 }}>
 					<Button size="large" onClick={() => setShowCreateForm(true)} sx={{ color: 'white', display: 'flex' }} variant="contained">
 						Add new task
@@ -91,12 +88,12 @@ export default function Tasks({ formatDate, order }) {
 			</Box>
 			<Paper elevation={2} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
 				{showCreateForm && (
-					<TaskFormComponent order={order} onSave={saveNewTask} onCancel={() => setShowCreateForm(false)} />
+					<TaskFormComponent task={task} onSave={saveNewTask} onCancel={() => setShowCreateForm(false)} />
 				)}
-				{tasks.map((task, index) => (
+				{/* {task.map((task, index) => (
 					<Box key={task.id}>
 						{editingTaskId === task.id ? (
-							<TaskFormComponent order={order} initialValue={task} onSave={saveEditedTask} onCancel={() => setEditingTaskId(null)} />
+							<TaskFormComponent task={task} initialValue={task} onSave={saveEditedTask} onCancel={() => setEditingTaskId(null)} />
 						) : (
 							<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', pb: 2 }}>
 								<Checkbox
@@ -149,9 +146,9 @@ export default function Tasks({ formatDate, order }) {
 								</Box>
 							</Box>
 						)}
-						{index !== order.tasks.length - 1 && <Divider />}
+						{index !== task.tasks.length - 1 && <Divider />}
 					</Box>
-				))}
+				))} */}
 			</Paper>
 		</Box>
 	)

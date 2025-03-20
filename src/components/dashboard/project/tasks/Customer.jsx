@@ -1,7 +1,7 @@
 'use client';
 import { Box, Typography } from '@mui/material';
 
-export default function Customer({ order }) {
+export default function Customer({ task }) {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 			<Typography sx={{fontWeight: 'bold'}} variant="h6" component="h2">
@@ -13,7 +13,7 @@ export default function Customer({ order }) {
 						Customer
 					</Typography>
 					<Typography variant="body1" component="p">
-						{order.user.name}
+						{task.userId}
 					</Typography>
 				</Box>
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -21,7 +21,7 @@ export default function Customer({ order }) {
 						Company
 					</Typography>
 					<Typography variant="body1" component="p">
-						{order.user.company}
+						{task.stats}
 					</Typography>
 				</Box>
 			</Box>

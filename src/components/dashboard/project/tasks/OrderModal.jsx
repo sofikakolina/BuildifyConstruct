@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import { OrderPriority } from '@prisma/client';
-import OrderDetails from './OrderDetails';
+// import OrderDetails from './OrderDetails';
 import DetailsTextarea from './DetailsTextarea';
 // import Proofing from './Proofing';
 import Tasks from './Tasks';
@@ -12,13 +12,12 @@ import Assets from './Assets';
 import Customer from './Customer';
 import Status from './Status';
 import TeamAssigment from './TeamAssigment';
-import ShippingAddresses from './ShippingAddresses';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import GeneratePdf from "./GeneratePdf";
 
-export default function OrderModal({ session, task, openOrder, handleCloseOrder, priority, setPriority, formatDate, staff, data, updateData }) {
+export default function OrderModal({ /*session,*/ task, openOrder, handleCloseOrder, priority, setPriority, formatDate, staff, data, updateData }) {
 
 	const handleChange = async event => {
 		const newPriority = event.target.value;
@@ -47,13 +46,15 @@ export default function OrderModal({ session, task, openOrder, handleCloseOrder,
 				aria-describedby="modal-modal-description"
 				sx={{
 					overflowY: 'auto',
+					height: "100%",
 				}}
 			>
 				<Box sx={{
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
-					overflowY: 'auto',
+					overflowY: 'auto', 
+					height: "100%",
 				}}>
 
 					<Box sx={{
@@ -75,7 +76,7 @@ export default function OrderModal({ session, task, openOrder, handleCloseOrder,
 							<CloseIcon />
 						</IconButton>
 						<Grid container spacing={2}>
-							<Grid item xs={9}>
+							<Grid item xs={8}>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 									<Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', gap:"15px" }}>
 										<GeneratePdf task={task} />
@@ -99,7 +100,7 @@ export default function OrderModal({ session, task, openOrder, handleCloseOrder,
 										</Link>
 									</Box>
 									<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-										<Typography variant="h4">ORD #{task.id}</Typography>
+										<Typography variant="h5">TSK #{task.id}</Typography>
 										<Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
 											<FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 												<InputLabel id="priority">Priority</InputLabel>
@@ -107,7 +108,7 @@ export default function OrderModal({ session, task, openOrder, handleCloseOrder,
 													labelId="priority"
 													id="priority"
 													value={priority}
-													label="Priority"
+													label="Приоритет"
 													onChange={handleChange}
 												>
 													<MenuItem value={OrderPriority.Normal}>{OrderPriority.Normal}</MenuItem>
@@ -117,19 +118,19 @@ export default function OrderModal({ session, task, openOrder, handleCloseOrder,
 										</Box>
 
 									</Box>
-									<OrderDetails task={task} userRole={session.user.role}/>
+									{/* <OrderDetails task={task} userRole={session.user.role}/> */}
 									{/*<Proofing session={session} formatDate={formatDate} task={task} />*/}
 									<DetailsTextarea task={task} />
 									<Tasks formatDate={formatDate} task={task} />
 									<Assets task={task} />
 								</Box>
 							</Grid>
-							<Grid item xs={3}>
+							<Grid item xs={4}>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
 									<Customer task={task} />
 									<Status formatDate={formatDate} task={task} data={data} />
 									<TeamAssigment task={task} staff={staff} />
-									<ShippingAddresses task={task} />
+									{/* <ShippingAddresses task={task} /> */}
 								</Box>
 							</Grid>
 						</Grid>

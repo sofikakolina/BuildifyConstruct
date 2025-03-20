@@ -15,18 +15,18 @@ import { useState } from "react";
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
-export default function OrderDetails({ order, userRole }) {
+export default function OrderDetails({ task, userRole }) {
 	// const [show, setShow] = useState(
 	// 	userRole === "Admin" || userRole === "Manager"
 	// );
 	const show = userRole === "Admin" || userRole === "Manager";
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedImage, setSelectedImage] = useState("");
+	const selectedImage = useState("");
 
-	const handleImageClick = (image) => {
-		setSelectedImage(image);
-		setIsOpen(true);
-	};
+	// const handleImageClick = (image) => {
+	// 	setSelectedImage(image);
+	// 	setIsOpen(true);
+	// };
 
 	return (
 		<>
@@ -48,7 +48,7 @@ export default function OrderDetails({ order, userRole }) {
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{order.orderItems.map((item, index) => (
+								{/* {task.orderItems.map((item, index) => (
 									<TableRow key={item.id} index={index}>
 										<TableCell>
 											<Box>
@@ -121,7 +121,7 @@ export default function OrderDetails({ order, userRole }) {
 											) : null}
 										</TableCell>
 									</TableRow>
-								))}
+								))} */}
 							</TableBody>
 
 							<TableFooter>
@@ -152,8 +152,8 @@ export default function OrderDetails({ order, userRole }) {
 													sx={{ fontSize: "16px" }}
 												>
 													Taxes (
-													{order.user.tax
-														? order.user.tax.rate
+													{task.userId
+														? task.userId
 														: 0}
 													)
 												</Typography>
@@ -183,10 +183,9 @@ export default function OrderDetails({ order, userRole }) {
 											variant="body1"
 											sx={{ fontSize: "16px" }}
 										>
-											{order.invoice.deliveryCost
+											{task.comment
 												? `$${
-														order.invoice
-															.deliveryCost / 100
+														task.comment
 												  }`
 												: "Pickup"}
 										</Typography>
@@ -207,7 +206,7 @@ export default function OrderDetails({ order, userRole }) {
 												variant="body1"
 												sx={{ fontSize: "16px" }}
 											>
-												${order.payment.amount / 100}
+												${task.details}
 											</Typography>
 										</TableCell>
 									</TableRow>

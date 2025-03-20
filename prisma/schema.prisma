@@ -11,6 +11,9 @@ enum Role {
   Admin
   PrivateOwner
   Executer
+  Designer
+  Architect
+  Buyer
   Client
 }
 
@@ -123,8 +126,8 @@ model Task {
   priority         OrderPriority     @default(Normal)
   name             String
   details          String?
-  image     String?
-  comment   String?
+  image            String?
+  comment          String?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   assignedStaff    User[]            @relation("AssignedTasks")

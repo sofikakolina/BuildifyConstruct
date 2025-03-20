@@ -1,23 +1,23 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Image, PDFDownloadLink, Font } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image, PDFDownloadLink, /*Font*/ } from '@react-pdf/renderer';
 import { IconButton, Box } from "@mui/material";
 // import { format } from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
-Font.register({
-  family: 'Roboto',
-  fonts: [
-    { src: '/fonts/Roboto-Regular.ttf', fontWeight: 400 },
-    { src: '/fonts/Roboto-Bold.ttf', fontWeight: 700 },
-  ],
-});
+// Font.register({
+//   family: 'Roboto',
+//   fonts: [
+//     { src: '/fonts/Roboto-Regular.ttf', fontWeight: 400 },
+//     { src: '/fonts/Roboto-Bold.ttf', fontWeight: 700 },
+//   ],
+// });
 
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 30,
-    fontFamily: 'Roboto'
+    // fontFamily: 'Roboto'
   },
   flexContainer: {
     flexDirection: 'row',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
 });
 
 
-const InvoiceDocument = ({ order }) => (
+const InvoiceDocument = ({ task }) => (
 
   <Document>
     <Page size="A4" style={styles.page}>
@@ -154,7 +154,7 @@ const InvoiceDocument = ({ order }) => (
       </View>
 
       <View style={styles.flexContainerCenter}>
-        <Text style={styles.invoiceHeader}>Order #{order.id}</Text>
+        <Text style={styles.invoiceHeader}>Задача #{task.id}</Text>
       </View>
 
 
@@ -165,7 +165,7 @@ const InvoiceDocument = ({ order }) => (
           <View style={styles.tableColHeader}><Text>Materials</Text></View>
           <View style={styles.tableColHeader}><Text>Quantity</Text></View>
         </View>
-        {order.orderItems.map((item, index) => {
+        {/* {task.orderItems.map((item, index) => {
           const imagePath = item.image.replace('https://storage.googleapis.com/decalshub/', '');
           return (
             <View key={index} style={styles.tableRow}>
@@ -190,17 +190,17 @@ const InvoiceDocument = ({ order }) => (
               <View style={styles.tableCol}><Text style={styles.tableCell}>{item.quantity}</Text></View>
             </View>
           );
-        })}
+        })} */}
       </View>
     </Page>
   </Document>
 );
 
 
-const GeneratePdfButton = ({ order }) => {
+const GeneratePdfButton = ({ task }) => {
 
   const downloadButton = (
-    <PDFDownloadLink document={<InvoiceDocument order={order} />} fileName={`order_${order.id}.pdf`}>
+    <PDFDownloadLink document={<InvoiceDocument task={task} />} fileName={`order_${task.id}.pdf`}>
       {({ loading }) =>
         loading ? 'Preparing document...' : (
           <IconButton

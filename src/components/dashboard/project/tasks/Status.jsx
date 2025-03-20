@@ -4,15 +4,15 @@ import { Box, Typography, Button, Popover, Autocomplete, TextField } from '@mui/
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { OrderStatus } from '@prisma/client';
+import { TaskStatus } from '@prisma/client';
 // import axios from 'axios';
 // import toast from 'react-hot-toast';
 import { useKanban } from './KanbanContext';
 
-export default function Status({ order, formatDate }) {
+export default function Status({ task, formatDate }) {
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [selectedStatus, setSelectedStatus] = useState(order.status);
-	const [selectedDate, setSelectedDate] = useState(dayjs(order.payment.dueDate));
+	const [selectedStatus, setSelectedStatus] = useState(task.status);
+	const [selectedDate, setSelectedDate] = useState(dayjs(task.targetEnd));
 	const [dateAnchorEl, setDateAnchorEl] = useState(null);
 	const {updateOrderStatus, updateOrderDueDate} = useKanban();
 
@@ -42,7 +42,7 @@ export default function Status({ order, formatDate }) {
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 				<Typography variant="h6" component="h2">
-					Status
+					Статус
 				</Typography>
 				<Box>
 					<Button sx={{ color: 'white', borderRadius: '8px' }} aria-describedby={statusId} variant="contained" onClick={handleStatusClick}>
@@ -61,12 +61,12 @@ export default function Status({ order, formatDate }) {
 				>
 					<Box sx={{ p: 2 }}>
 						<Autocomplete
-							options={Object.keys(OrderStatus)}
+							options={Object.keys(TaskStatus)}
 							style={{ padding: 2, width: 300 }}
 							renderInput={(params) => <TextField {...params} label="Status" />}
 							onChange={(event, newValue) => {
                                 if (newValue) {
-                                    updateOrderStatus(order.id, newValue).then(() => {
+                                    updateOrderStatus(task.id, newValue).then(() => {
                                         setSelectedStatus(newValue);
                                     });
                                 }
@@ -102,7 +102,7 @@ export default function Status({ order, formatDate }) {
 								value={selectedDate}
 								onChange={(newValue) => {
                                     if (newValue) {
-                                        updateOrderDueDate(order.id, newValue).then(() => {
+                                        updateOrderDueDate(task.id, newValue).then(() => {
                                             setSelectedDate(newValue);
                                         });
                                     }

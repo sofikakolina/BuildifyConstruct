@@ -117,7 +117,7 @@ export default function CreateOrder() {
 		<>
 			<Paper square={false} elevation={1} sx={{ padding: 4 }}>
 				<Box sx={{ mb: 4 }}>
-					<Typography color="primary" variant="h2" sx={{ fontSize: "32px" }}>{"Create order"}</Typography>
+					<Typography color="#f69220" variant="h2" sx={{ fontSize: "32px" }}>{"Создать задачу"}</Typography>
 				</Box>
 				<Box>
 					<div>
@@ -476,7 +476,7 @@ export default function CreateOrder() {
 
 						<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
 							<Button type="submit" size="large" variant="contained" color="primary" sx={{ color: "white" }} onClick={()=>sendData()}>
-								{ isLoading ?  "Creating..." : "Create order" }
+								{ isLoading ?  "Создание..." : "Создать задачу" }
 							</Button>
 						</Box>
 					</div>

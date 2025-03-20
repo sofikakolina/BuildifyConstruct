@@ -1,8 +1,8 @@
 'use client';
-import { Box, Typography, IconButton, Button, Paper, Divider, Popover } from '@mui/material';
+import { Box, Typography, Button, Paper, Popover } from '@mui/material';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Delete, Download } from '@mui/icons-material';
+// import { Delete, Download } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 import { useKanban } from './KanbanContext';
 import axios from 'axios';
@@ -28,16 +28,16 @@ interface OrderAsset {
 
 interface OrderBoardComponentProps {
   session: Session | null; // Используйте тип Session
-  order: Order; // Тип для order
+  task: Order; // Тип для task
 }
 
-export default function Assets({ order }: OrderBoardComponentProps) {
+export default function Assets({ task }: OrderBoardComponentProps) {
   const [files, setFiles] = useState<{ id: string; preview: string; name: string; size: number }[]>([]);
   const [openDropzone, setOpenDropzone] = useState(false);
   const [anchorElDropzone, setAnchorElDropzone] = useState<null | HTMLElement>(null);
-  const [assets, setAssets] = useState(order.assets);
+  // const [assets, setAssets] = useState(task.assets);
   const [srcs, setSrcs] = useState<string[]>([]);
-  const { addAsset, deleteAsset } = useKanban();
+  const { addAsset } = useKanban();
   const { getRootProps, getInputProps } = useDropzone({
     accept: { 'image/*': ['.jpeg', '.jpg', '.png'] },
     onDrop: async (acceptedFiles) => {
@@ -81,7 +81,7 @@ export default function Assets({ order }: OrderBoardComponentProps) {
       srcs.map(async (src, i) => {
         try {
           const response = await axios.post<{ orderAsset: OrderAsset }>('/api/createOrderAsset', {
-            orderId: order.id,
+            orderId: task.id,
             src,
             name: files[i].name,
           });
@@ -95,20 +95,20 @@ export default function Assets({ order }: OrderBoardComponentProps) {
 
     // Фильтруем null значения
     const validAssets = newAssets.filter((asset) => asset !== null) as OrderAsset[];
-    setAssets((prevAssets) => [...prevAssets, ...validAssets]);
-    validAssets.forEach((asset) => addAsset(order.id, asset));
+    // setAssets((prevAssets) => [...prevAssets, ...validAssets]);
+    validAssets.forEach((asset) => addAsset(task.id, asset));
     setFiles([]);
     handleCloseDropzone();
   };
 
-  const handleRemoveAsset = (assetId: string) => {
-    axios.post('/api/deleteOrderAsset', { id: assetId })
-      .then(() => {
-        setAssets((prev) => prev.filter((asset) => asset.id !== assetId));
-        deleteAsset(order.id, assetId);
-      })
-      .catch((error) => toast.error(error.message));
-  };
+  // const handleRemoveAsset = (assetId: string) => {
+  //   axios.post('/api/deleteOrderAsset', { id: assetId })
+  //     .then(() => {
+  //       setAssets((prev) => prev.filter((asset) => asset.id !== assetId));
+  //       deleteAsset(task.id, assetId);
+  //     })
+  //     .catch((error) => toast.error(error.message));
+  // };
 
   const handleRemoveFromDropZone = (i: number) => {
     setSrcs((prev) => {
@@ -129,7 +129,7 @@ export default function Assets({ order }: OrderBoardComponentProps) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography sx={{ fontWeight: 'bold', mb: 2 }} variant="body1">
-          Assets ({order.assets.length})
+          Assets {/*({task.assets.length})*/}
         </Typography>
         <Button size="large" aria-describedby={idDropzone} onClick={handleClickDropzone} sx={{ color: 'white', display: 'flex' }} variant="contained">
           Add new asset
@@ -188,7 +188,7 @@ export default function Assets({ order }: OrderBoardComponentProps) {
         </Box>
       </Popover>
       <Paper elevation={2} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {assets.map((asset, index) => (
+        {/* {assets.map((asset, index) => (
           <Box key={asset.id}>
             <Box sx={{ display: 'flex', gap: 2, py: 2 }}>
               <img className="rounded max-h-[100px]" src={asset.src} alt={asset.name} />
@@ -232,9 +232,9 @@ export default function Assets({ order }: OrderBoardComponentProps) {
                 </Box>
               </Box>
             </Box>
-            {index !== order.assets.length - 1 && <Divider />}
+            {index !== task.assets.length - 1 && <Divider />}
           </Box>
-        ))}
+        ))} */}
       </Paper>
     </Box>
   );
