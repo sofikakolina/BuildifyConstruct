@@ -7,7 +7,7 @@ import { OrderPriority } from '@prisma/client';
 // import OrderDetails from './OrderDetails';
 import DetailsTextarea from './DetailsTextarea';
 // import Proofing from './Proofing';
-import Tasks from './Tasks';
+import Documents from './Documents';
 import Assets from './Assets';
 import Customer from './Customer';
 import Status from './Status';
@@ -121,7 +121,7 @@ export default function OrderModal({ /*session,*/ task, openOrder, handleCloseOr
 									{/* <OrderDetails task={task} userRole={session.user.role}/> */}
 									{/*<Proofing session={session} formatDate={formatDate} task={task} />*/}
 									<DetailsTextarea task={task} />
-									<Tasks formatDate={formatDate} task={task} />
+									<Documents formatDate={formatDate} task={task} />
 									<Assets task={task} />
 								</Box>
 							</Grid>

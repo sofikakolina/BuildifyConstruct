@@ -6,6 +6,8 @@ import { authOptions } from "@/app/api/auth/auth.config";
 
 const include = {
     assignedStaff:true,
+    documents:true,
+    paymentDocuments:true,
 }
 interface StaffMember {
     id: string;
