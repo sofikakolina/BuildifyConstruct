@@ -31,7 +31,7 @@ const TaskCard = ({ task, session, staff }) => {
 	const [anchorElDate, setAnchorElDate] = useState(null);
 	// const [openOrderModal, setOpenOrderModal] = useState(false);
 	// изменить потом на false
-	const [openOrderModal, setOpenOrderModal] = useState(false);
+	const [openOrderModal, setOpenOrderModal] = useState(true);
 
 	const formatDate = (dateString) => dayjs(dateString).format("ddd, MM/DD");
 

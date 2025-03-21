@@ -98,14 +98,30 @@ model Project {
   userId    String[]
   users     User[]   @relation("UserProjects")
   documents Document[] // Документы, привязанные к проекту
+  paymentDocuments paymentDocument[] // Документы, привязанные к проекту
+  ifc       IFC[] // IFC, привязанные к проекту
 }
 
 model Document {
   id        String   @id @default(cuid())
+  name     String
   title     String
-  url       String
+  path      String
+  project   Project  @relation(fields: [projectId], references: [id])
+  task      Task  @relation(fields: [taskId], references: [id])
+  taskId String
+  projectId String
+  createdAt DateTime @default(now())
+}
+model paymentDocument {
+  id        String   @id @default(cuid())
+  name      String
+  title     String
+  path      String
   project   Project  @relation(fields: [projectId], references: [id])
   projectId String
+  task      Task  @relation(fields: [taskId], references: [id])
+  taskId String
   createdAt DateTime @default(now())
 }
 
@@ -114,7 +130,8 @@ model IFC {
   name      String
   title     String
   path      String   @unique
-  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String 
   createdAt DateTime @default(now())
 }
 
@@ -131,6 +148,8 @@ model Task {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   assignedStaff    User[]            @relation("AssignedTasks")
+  documents        Document[] // Документы, привязанные к проекту
+  paymentDocuments paymentDocument[] // Документы, привязанные к проекту
   startDate        DateTime          @default(now())
   targetEnd        DateTime?      
 }
