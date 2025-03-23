@@ -147,7 +147,7 @@ const Documents = ({task}) => {
 			</div>
 			<button  
 				onClick={handleDocumentUpload}
-				className="bg-purple-400 hover:bg-gold-hover shadow-md py-2 rounded-md text-white transition"
+				className="bg-gold hover:bg-gold-hover shadow-md py-2 rounded-md text-white transition"
 			>
 				Сохранить документ
 			</button>
