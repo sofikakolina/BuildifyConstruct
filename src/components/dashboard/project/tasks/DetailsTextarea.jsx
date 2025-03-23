@@ -1,5 +1,5 @@
 'use client';
-import { Box, TextField, Typography, Button, Paper } from '@mui/material';
+import { Box, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from 'react';
 import axios from 'axios';
@@ -38,8 +38,8 @@ export default function DetailsTextarea({ task }) {
 
 	return (
 		<Box>
-			<Typography sx={{ fontWeight: 'bold', mb: 2 }} variant='body1'>Детали</Typography>
 			<Paper elevation={2} sx={{ p: 2, minHeight: '150px' }}>
+				<h2 className="font-bold text-lg">Детали</h2>
 				{!isEditing ? (
 					<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<Box sx={{ flexGrow: 1 }}>{text}</Box>
@@ -57,11 +57,13 @@ export default function DetailsTextarea({ task }) {
 							onChange={handleChangeDetails}
 						/>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Button size="large" onClick={handleSave}
-								sx={{ color: 'white', display: 'flex' }}
+							<button 
+								size="large" 
+								onClick={handleSave}
+								className='bg-gold hover:bg-gold-hover px-6 py-2 rounded-lg text-white transition-colors duration-200'
 								variant="contained">
-								Save
-							</Button>
+								Сохранить
+							</button>
 						</Box>
 					</Box>
 				)}

@@ -61,38 +61,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    // Check if an IFC file already exists for this project
-    // const existingIFC = await prisma.document.findMany({
-    //   where: {
-    //     projectId: projectId,
-    //   },
-    // });
-
-    // if (existingIFC) {
-    //   // Option 1: Delete the existing file and replace it
-    //   const uploadDir = path.join(process.cwd(), "public/uploads");
-    //   const existingFilePath = path.join(uploadDir, existingIFC.name);
-
-    //   // Delete the existing file from the server
-    //   if (fs.existsSync(existingFilePath)) {
-    //     fs.unlinkSync(existingFilePath);
-    //   }
-
-    //   // Delete the existing record from the database
-    //   await prisma.iFC.delete({
-    //     where: {
-    //       id: existingIFC.id,
-    //     },
-    //   });
-
-      // Option 2: Reject the upload and notify the user
-      // return NextResponse.json(
-      //   { error: "An IFC file already exists for this project" },
-      //   { status: 400 }
-      // );
-    // }
-
     // Save the new file to the server
     const uploadDir = path.join(process.cwd(), "public/uploads");
     if (!fs.existsSync(uploadDir)) {
@@ -123,3 +91,50 @@ export async function POST(request: Request) {
     );
   }
 }
+
+
+  export async function DELETE(request: Request) {
+    // const session = await getServerSession(authOptions);
+    try {
+        // if (!session || session?.user.role != "Admin"){
+        //     return NextResponse.json("У вас нет доступа!", { status: 403 });
+        // }
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("documentId");
+
+                
+        if (!id) {
+            return NextResponse.json(
+                { error: 'ID документа обязателен' },
+                { status: 400 }
+            );
+        }
+        
+        // Находим пользователя и проект
+        const document = await prisma.document.findUnique({
+            where: { id: id },
+        });
+  
+        // Проверяем, что пользователь и проект существуют
+        if (!document) {
+            return NextResponse.json(
+                { error: 'Документ не найден' },
+                { status: 404 }
+            );
+        }
+        
+        // Обновляем проект, добавляя пользователя
+        const updatedProject = await prisma.document.delete({
+            where: { id: id },
+        });
+        
+        // Возвращаем обновлённый проект
+        return NextResponse.json(updatedProject, { status: 200 });
+    } catch (error) {
+        console.error('Ошибка при добавлении пользователя в проект:', error);
+        return NextResponse.json(
+            { error: 'Ошибка сервера' },
+            { status: 500 }
+        );
+    }
+} 

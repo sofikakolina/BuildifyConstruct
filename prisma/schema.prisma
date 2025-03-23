@@ -116,6 +116,7 @@ model Document {
 model paymentDocument {
   id        String   @id @default(cuid())
   name      String
+  cost      Int
   title     String
   path      String
   project   Project  @relation(fields: [projectId], references: [id])
