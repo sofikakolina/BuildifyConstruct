@@ -1,5 +1,5 @@
-import CreateOrder from "@/components/dashboard/project/tasks/CreateOrder"
+import CreateTask from "@/components/dashboard/project/tasks/CreateTask"
 
-export default async function ProductCreate() {
-    return <CreateOrder />
+export default async function TaskCreate() {
+    return <CreateTask />
 }

@@ -38,7 +38,7 @@ const TaskCard = ({ task, session, staff }) => {
 	const handleChangePriority = async (event) => {
 		const newPriority = event.target.value;
 		try {
-			await axios.post("/api/dashboard/projects/tasks", {
+			await axios.put("/api/dashboard/projects/tasks", {
 				id: task.id,
 				priority: newPriority,
 			});

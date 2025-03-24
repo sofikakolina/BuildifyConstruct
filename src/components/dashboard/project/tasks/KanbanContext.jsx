@@ -113,7 +113,7 @@ export const KanbanProvider = ({ children }) => {
 		setData(newData);
 
 		try {
-			await axios.post("/api/dashboard/projects/tasks", {
+			await axios.put("/api/dashboard/projects/tasks", {
 				id: newData.columns[destination.droppableId].tasks[destination.index].id,
 				// projectId: idCurrentProject,
 				status: newData.columns[destination.droppableId].tasks[destination.index].status
@@ -279,7 +279,7 @@ export const KanbanProvider = ({ children }) => {
 		}
 
 		try {
-			await axios.post("/api/dashboard/projects/tasks", { id: orderId, status: newStatus });
+			await axios.put("/api/dashboard/projects/tasks", { id: orderId, status: newStatus });
 			setData(prevData => {
 				let newData = { ...prevData };
 				let sourceColumnId, destColumnId, sourceIndex;
@@ -317,7 +317,7 @@ export const KanbanProvider = ({ children }) => {
 
 	const updateOrderDueDate = async (orderId, newDueDate) => {
 		try {
-			await axios.post("/api/dashboard/projects/tasks", { id: orderId, dueDate: newDueDate.toISOString() });
+			await axios.put("/api/dashboard/projects/tasks", { id: orderId, dueDate: newDueDate.toISOString() });
 			setData(prevData => {
 				const newData = { ...prevData };
 				Object.keys(newData.columns).forEach(columnKey => {

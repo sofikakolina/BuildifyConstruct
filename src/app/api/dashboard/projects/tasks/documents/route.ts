@@ -11,12 +11,12 @@ export async function GET(request: Request) {
     const projectId = searchParams.get("projectId");
     const taskId = searchParams.get("taskId");
     
-    if (!projectId || !taskId){
-      return NextResponse.json(
-        { error: "Требуется id проекта или id задачи" },
-        { status: 400 }
-      )
-    }
+    // if (!projectId || !taskId){
+    //   return NextResponse.json(
+    //     { error: "Требуется id проекта или id задачи" },
+    //     { status: 400 }
+    //   )
+    // }
     if (taskId){
       const documents = await prisma.document.findMany({
         where: {
@@ -24,15 +24,21 @@ export async function GET(request: Request) {
         },
       });
       return NextResponse.json({documents});
+    } 
+    if (projectId) {
+      const documents = await prisma.document.findMany({
+        where: {
+          projectId: projectId 
+        },
+      });
+      return NextResponse.json({documents});
+      // Получаем все проекты из базы данных
     }
 
-    const documents = await prisma.document.findMany({
-      where: {
-        projectId: projectId 
-      },
-    });
-    return NextResponse.json({documents});
-    // Получаем все проекты из базы данных
+    return NextResponse.json(
+      { error: "Failed требуется id проекта или задачи" },
+      { status: 400 }
+    );
     
 
   } catch (error) {

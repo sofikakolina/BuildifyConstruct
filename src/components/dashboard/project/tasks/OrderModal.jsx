@@ -24,7 +24,7 @@ export default function OrderModal({ task, openOrder, handleCloseOrder, priority
 	const handleChange = async event => {
 		const newPriorityFromUser = event.target.value;
 		try {
-			await axios.post("/api/dashboard/projects/tasks", { id: task.id, priority: newPriorityFromUser });
+			await axios.put("/api/dashboard/projects/tasks", { id: task.id, priority: newPriorityFromUser });
 			setPriority(newPriorityFromUser);
 			setNewPriority(newPriorityFromUser);
 

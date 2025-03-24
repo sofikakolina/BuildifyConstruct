@@ -170,8 +170,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ tasks });
 }
 
+export async function POST(request: NextRequest) {
+    try {
+      const { ...data } = await request.json(); // Извлекаем id и оставляем остальные поля динамическими
+  
+      if (!data) {
+        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      }
+      console.log(data)
+      const task = await prisma.task.create({
+        data: data, // Передаём все остальные поля в data
+      });
+      
+      return NextResponse.json(task, { status: 200 });
+    } catch (error) {
+      console.error("Error updating task:", error);
+      return NextResponse.json(
+        { error: "Failed to update task" },
+        { status: 500 }
+      );
+    }
+  }
+  
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
     try {
       const { id, ...updateData } = await request.json(); // Извлекаем id и оставляем остальные поля динамическими
   

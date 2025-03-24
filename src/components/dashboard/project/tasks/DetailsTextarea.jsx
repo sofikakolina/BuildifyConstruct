@@ -18,7 +18,7 @@ export default function DetailsTextarea({ task }) {
 
 	const handleSave = async () => {
 		try {
-			await axios.post("/api/dashboard/projects/tasks", { id: task.id, details: text });
+			await axios.put("/api/dashboard/projects/tasks", { id: task.id, details: text });
 			const updatedOrder = { ...task, details: text };
 			const columnIndex = data.columnTask.findIndex(col => data.columns[col].tasks.some(o => o.id === task.id));
 			const orderIndex = data.columns[data.columnTask[columnIndex]].tasks.findIndex(o => o.id === task.id);

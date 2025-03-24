@@ -15,9 +15,9 @@ const Documents = ({task}) => {
 	const [titleFile, setTitleFile] = useState('');
 	//   const [selectedIFC, setSelectedIFC] = useState(null);
 	const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
-		useEffect(() => {
-			setDocuments(task.documents)
-		},[])
+	useEffect(() => {
+		setDocuments(task.documents)
+	},[])
 	const handleFileUpload = async (event) => {
 		const file = event.target.files?.[0];
 		if (!file) return;
