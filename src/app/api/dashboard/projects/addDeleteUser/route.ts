@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { PrismaClient, Role } from '@prisma/client';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/auth.config";
-
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
@@ -45,8 +44,9 @@ export async function POST(request: Request) {
                 { status: 404 }
             );
         }
-        const team = user.role == "Client"? [Role.Client] : [Role.Executer]
+        const team = user.role == "Client"? [Role.Client] : Object.keys(Role) as Role[]
         // Обновляем проект, добавляя пользователя
+        console.log(team)
         const updatedProject = await prisma.project.update({
             where: { id: projectId },
             data: {

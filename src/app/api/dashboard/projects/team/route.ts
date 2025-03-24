@@ -40,8 +40,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    // Создаем проект в базе данных
+    console.log(idCurrentProject)
     const workers = await prisma.user.findMany({
       where: {
         project: {
@@ -57,11 +56,12 @@ export async function POST(request: Request) {
         id: true,
         firstName: true,
         lastName: true,
+        project: true,
         email: true,
         role: true,
       },
     });
-
+    console.log(workers)
     return NextResponse.json(workers, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);

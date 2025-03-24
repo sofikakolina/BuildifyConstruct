@@ -1,2 +1,2 @@
 export const NavbarHeight = 50
-export const SidebarWidth = 280
+export const SidebarWidth = 290

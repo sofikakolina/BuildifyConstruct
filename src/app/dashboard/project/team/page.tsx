@@ -27,6 +27,7 @@ const Page = () => {
 
     fetchData()
   }, [idCurrentProject])
+
   const hadnleAddUserToProject = async(userId: string) =>{
     try{
       const addUser = await axios.post("/api/dashboard/projects/addDeleteUser", {projectId: idCurrentProject, userId: userId})
@@ -39,6 +40,7 @@ const Page = () => {
       toast(`${error}`)
     }
   }
+  
   const hadnleDeleteUserFromProject = async(userId: string) =>{
     try{
         const deleteUser = await axios.delete("/api/dashboard/projects/addDeleteUser", {

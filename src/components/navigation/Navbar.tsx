@@ -6,51 +6,71 @@ import { NavbarHeight } from './Sizes';
 import { useRouter } from "next/navigation";
 import { VscSignOut } from "react-icons/vsc";
 import Link from "next/link";
+
 const Navbar = () => {
   const { data: session } = useSession();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+
   const handleAvatarClick = () => {
     setIsPopupVisible(!isPopupVisible);
   };
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
-    setIsPopupVisible(false); // Закрываем popup после выхода
-    router.push("/auth/signin")
+    setIsPopupVisible(false);
+    router.push("/auth/signin");
   };
 
   if (session?.user) {
     return (
       <div 
+        className="top-0 right-0 left-0 z-50 fixed bg-primary shadow-md"
         style={{ height: `${NavbarHeight}px` }}
-        className={`bg-primary flex justify-center`}
       >
-        <div className='flex justify-between items-center container'>
+        <div className="flex justify-between items-center mx-auto px-4 h-full container">
           <div>
-            <Link href={"/client"} className='flex items-center gap-1 text-white text-3xl'><h3 className="text-white">Buildify</h3><h3 className="text-gold">Construct</h3></Link>
+            <Link 
+              href={"/client"} 
+              className="flex items-center gap-1 hover:opacity-80 text-white text-3xl transition-opacity"
+            >
+              <h3 className="text-white">Buildify</h3>
+              <h3 className="text-gold">Construct</h3>
+            </Link>
           </div>
-          <div className='relative flex items-center gap-5'>
-            <h3 className='text-white'>{session.user.firstName} {session.user.lastName} ({session.user.role})</h3>
-            <div 
-              className='bg-gray-400 p-4 rounded-full cursor-pointer'
-              onClick={handleAvatarClick}
-            ></div>
-            <button
-                  onClick={handleSignOut}
-                  className="bg-red-700 px-2 py-2 rounded-full text-white"
-                >
-                  <VscSignOut size={20}/>
-                </button>
+          
+          <div className="relative flex items-center gap-4">
+            <h3 className="hidden md:block text-white">
+              {session.user.firstName} {session.user.lastName} ({session.user.role})
+            </h3>
             
-            {/* Popup для выхода */}
+            <div className="flex items-center gap-2">
+              <div 
+                className="bg-gray-400 hover:opacity-80 rounded-full w-10 h-10 transition-opacity cursor-pointer"
+                onClick={handleAvatarClick}
+              ></div>
+              
+              <button
+                onClick={handleSignOut}
+                className="bg-red-700 hover:bg-red-800 p-2 rounded-full text-white transition-colors"
+                title="Выйти"
+              >
+                <VscSignOut size={20}/>
+              </button>
+            </div>
+
+            {/* Popup для выхода (мобильная версия) */}
             {isPopupVisible && (
-              <div className="top-12 right-0 absolute bg-white shadow-lg p-4 rounded-lg">
+              <div className="top-full right-0 z-50 absolute bg-white shadow-lg mt-2 p-3 rounded-lg">
+                <p className="md:hidden mb-2 text-gray-700 text-sm">
+                  {session.user.firstName} {session.user.lastName}
+                </p>
                 <button
                   onClick={handleSignOut}
-                  className="bg-red-700 text-red-500 hover:text-white-700"
+                  className="flex items-center gap-2 w-full text-red-600 hover:text-red-800 text-sm"
                 >
-                  <VscSignOut />
+                  <VscSignOut size={16}/>
+                  Выйти
                 </button>
               </div>
             )}
@@ -60,7 +80,7 @@ const Navbar = () => {
     );
   }
 
-  return <div>Not signed in</div>;
+  return null;
 };
 
 export default Navbar;
