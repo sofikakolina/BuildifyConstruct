@@ -4,27 +4,28 @@ import axios from 'axios'; // Импортируем AxiosError для типи�
 import { useAppSelector } from '@/lib/hooks';
 import toast from "react-hot-toast";
 // import IFCViewer from "@/components/dashboard/project/ifc/IFCViewer";
-import { TextField } from "@mui/material";
+import { InputAdornment, OutlinedInput, TextField } from "@mui/material";
 import { MdDelete, MdDownload } from 'react-icons/md';
 import { downloadFile } from "@/lib/download";
 
-const Documents = () => {
+const PaymentDocuments = () => {
 	const [file, setFile] = useState(null);
 	const [documents, setDocuments] = useState([]);
 	const [nameFile, setNameFile] = useState('');
+	const [cost, setCost] = useState(0);
 	const [titleFile, setTitleFile] = useState('');
 	//   const [selectedIFC, setSelectedIFC] = useState(null);
 	const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
 	useEffect(() => {
 		const fetchData = async ()  => {
 			try{
-				const { data: documents}  = await axios.get("/api/dashboard/projects/tasks/documents", {
+				const { data: paymentDocuments}  = await axios.get("/api/dashboard/projects/tasks/paymentDocuments", {
 					params: {
 						projectId: idCurrentProject
 					}
 				})
-				console.log(documents.documents)
-				setDocuments(documents.documents)
+				console.log(paymentDocuments.paymentDocuments)
+				setDocuments(paymentDocuments.paymentDocuments)
 			} catch (error) {
 				toast.error(`Ошибка загрузки документа: ${error.message}`);
 			}
@@ -43,18 +44,19 @@ const Documents = () => {
 		formData.append("file", file);
 		formData.append("projectId", idCurrentProject);
 		// formData.append("taskId", task.id);
+		formData.append("cost", Math.round(cost*100));
 		formData.append("name", nameFile);
 		formData.append("title", titleFile);
 
 		try {
-		const response = await axios.post("/api/dashboard/projects/tasks/documents", formData, {
+		const response = await axios.post("/api/dashboard/projects/tasks/paymentDocuments", formData, {
 			headers: {
 			"Content-Type": "multipart/form-data",
 			},
 		});
 
 		if (response.status === 200) {
-			setDocuments(prev => [response.data.document, ...prev]) // Заменяем существующий IFC-файл
+			setDocuments(prev => [response.data.paymentDocument, ...prev]) // Заменяем существующий IFC-файл
 			setNameFile('')
 			setTitleFile('')
 			setFile(null)
@@ -78,7 +80,7 @@ const Documents = () => {
 	};
 
 	const handleDeleteFile = async (documentId) => {
-		const response = await axios.delete("/api/dashboard/projects/tasks/documents", {
+		const response = await axios.delete("/api/dashboard/projects/tasks/paymentDocuments", {
 			params: {
 			documentId: documentId
 		}});
@@ -95,7 +97,34 @@ const Documents = () => {
 	const handleChangeTitleFile = (event) => {
 		setTitleFile(event.target.value);
 	};
-
+	const handleChangeCost = (event) => {
+		const value = event.target.value;
+		if (value[0]==0) value.slice(0,1)
+		// Проверка на пустое значение
+		if (value === "") {
+		  setCost("");
+		  return;
+		}
+	
+		// Проверка на число и неотрицательное значение
+		if (/^\d*\.?\d*$/.test(value) && parseFloat(value) >= 0) {
+		  setCost(value);
+		}
+	};
+	const handleFocus = (event) => {
+		// Стираем "0" при фокусе
+		if (event.target.value === "0") {
+		  setCost("");
+		}
+	};
+	
+	const handleBlur = (event) => {
+		// Если поле пустое, возвращаем "0"
+		if (event.target.value === "") {
+		  setCost("0");
+		}
+	};
+	
 	return (
 		<div className="flex flex-col gap-4 shadow-2xl p-4 border-2 rounded-lg">
 			<h2 className="font-bold text-lg">Документы</h2>
@@ -148,6 +177,22 @@ const Documents = () => {
 					value={nameFile}
 					onChange={handleChangeNameFile}
 				/>
+				<OutlinedInput
+					id="outlined-adornment-weight"
+					placeholder="Сумма..."
+					type="text" // Меняем на text, чтобы контролировать ввод
+					value={cost}
+					onChange={handleChangeCost}
+					onFocus={handleFocus} // Обработчик фокуса
+					onBlur={handleBlur} // Обработчик потери фокуса
+					endAdornment={<InputAdornment position="end">руб</InputAdornment>}
+					aria-describedby="outlined-weight-helper-text"
+					inputProps={{
+						"aria-label": "weight",
+						inputMode: "numeric", // Подсказка для мобильных устройств
+						pattern: "[0-9]*", // Паттерн для числового ввода
+					}}
+				/>
 				<TextField
 					aria-label="titleFile"
 					rows={4}
@@ -197,4 +242,4 @@ const Documents = () => {
 	);
 };
 
-export default Documents;
+export default PaymentDocuments;

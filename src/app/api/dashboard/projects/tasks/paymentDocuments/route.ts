@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const projectId = searchParams.get("projectId");
     const taskId = searchParams.get("taskId");
     
-    if (!projectId || !taskId){
+    if (!projectId && !taskId){
       return NextResponse.json(
         { error: "Требуется id проекта или id задачи" },
         { status: 400 }
@@ -25,13 +25,14 @@ export async function GET(request: Request) {
       });
       return NextResponse.json({paymentDocuments});
     }
-
-    const paymentDocuments = await prisma.paymentDocument.findMany({
-      where: {
-        projectId: projectId 
-      },
-    });
-    return NextResponse.json({paymentDocuments});
+    if (projectId){
+      const paymentDocuments = await prisma.paymentDocument.findMany({
+        where: {
+          projectId: projectId 
+        },
+      });
+      return NextResponse.json({paymentDocuments});
+    }
     // Получаем все проекты из базы данных
     
 

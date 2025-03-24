@@ -11,12 +11,13 @@ export async function GET(request: Request) {
     const projectId = searchParams.get("projectId");
     const taskId = searchParams.get("taskId");
     
-    // if (!projectId || !taskId){
-    //   return NextResponse.json(
-    //     { error: "Требуется id проекта или id задачи" },
-    //     { status: 400 }
-    //   )
-    // }
+    if (!taskId && !projectId){
+      return NextResponse.json(
+        { error: "Failed требуется id проекта или задачи" },
+        { status: 400 }
+      );
+    }
+    
     if (taskId){
       const documents = await prisma.document.findMany({
         where: {
@@ -34,11 +35,6 @@ export async function GET(request: Request) {
       return NextResponse.json({documents});
       // Получаем все проекты из базы данных
     }
-
-    return NextResponse.json(
-      { error: "Failed требуется id проекта или задачи" },
-      { status: 400 }
-    );
     
 
   } catch (error) {
@@ -60,7 +56,6 @@ export async function POST(request: Request) {
     const taskId = formData.get("taskId") as string;
     const name = formData.get("name") as string;
     const title = formData.get("title") as string;
-    console.log(name, title, projectId)
     if (!file || !projectId || !name) {
       return NextResponse.json(
         { error: "File and projectId are required" },
