@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { MdCurrencyRuble , MdReceipt } from 'react-icons/md';
-
+import { formatMoney } from "@/lib/formatMoney";
 const PaymentDocuments = () => {
   const [analytics, setAnalytics] = useState({
     totalCost: 0,
@@ -47,14 +47,6 @@ const PaymentDocuments = () => {
     
     fetchData();
   }, [idCurrentProject]);
-
-  const formatMoney = (amount) => {
-    return new Intl.NumberFormat('ru-RU', {
-      style: 'currency',
-      currency: 'RUB',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
 
   return (
     <div className="bg-white shadow-lg p-6 rounded-xl">

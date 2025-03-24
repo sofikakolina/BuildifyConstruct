@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { InputAdornment, OutlinedInput, TextField } from "@mui/material";
 import { MdDelete, MdDownload } from 'react-icons/md';
 import { downloadFile } from "@/lib/download";
+import { formatMoney } from "@/lib/formatMoney";
 
 const PaymentDocuments = () => {
 	const [file, setFile] = useState(null);
@@ -216,6 +217,7 @@ const PaymentDocuments = () => {
 					<div className="flex flex-col items-start">
 						<h3 className="font-semibold text-gray-800 text-lg">{document.name}</h3>
 						<h3 className="text-gray-600 text-lg">{document.title}</h3>
+						<h3 className="text-gray-600 text-lg">{formatMoney(document.cost/100)}</h3>
 						{document.taskId && <h3 className="text-gray-600 text-lg">taskId: {document.taskId}</h3>}
 					</div>
 					<div className="flex items-center gap-2">
