@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProjectCard from "@/components/general/ProjectCard";
+import axios from "axios";
 
 interface Project {
   id: string;
@@ -21,6 +22,7 @@ export default function Home() {
     // Запрашиваем данные с API
     const fetchProjects = async () => {
       try {
+        axios.get("api/python/doors")
         const response = await fetch("/api/dashboard/projects");
         if (!response.ok) {
           throw new Error("Failed to fetch projects");
@@ -45,12 +47,18 @@ export default function Home() {
     return <div>Error: {error}</div>;
   }
 
+  // const handlePythonApi = async() => {
+  //   axios.get("api/python/doors")
+  // }
   return (
     <div
       className="flex flex-col justify-items-center items-start gap-16 p-8 sm:p-20 pb-20 font-[family-name:var(--font-geist-sans)]"
       style={{ height: "calc(100vh - 50px)" }}
     >
       <div className="flex justify-between w-full">
+        {/* <button onClick={handlePythonApi}>
+          Питон апи
+        </button> */}
         <Link
           href="/dashboard/create-project"
           className="bg-blue-500 hover:bg-blue-600 shadow-md px-6 py-3 rounded-lg text-white transition-colors"

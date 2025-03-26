@@ -100,6 +100,8 @@ model Project {
   documents Document[] // Документы, привязанные к проекту
   paymentDocuments paymentDocument[] // Документы, привязанные к проекту
   ifc       IFC[] // IFC, привязанные к проекту
+  slabs     Slab[]
+  columns   Column[]
 }
 
 model Document {
@@ -167,4 +169,87 @@ enum TaskStatus {
 enum OrderPriority {
   Normal
   Rush
+}
+
+
+model Slab {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  slabs       SlabElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalVolume])
+}
+
+model SlabElement {
+  id          String   @id @default(cuid())
+  slabId      String
+  slab        Slab     @relation(fields: [slabId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  elevation   Float?   // Для точной сортировки уровней
+  volume      Float?
+  area        Float?
+  thickness   Float?
+  material    String?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("slab_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+model Column {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  columns     ColumnElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalVolume])
+}
+
+model ColumnElement {
+  id          String   @id @default(cuid())
+  columnId      String
+  column      Column     @relation(fields: [columnId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  elevation   Float?   // Для точной сортировки уровней
+  volume      Float?
+  area        Float?
+  thickness   Float?
+  material    String?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("column_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
 }

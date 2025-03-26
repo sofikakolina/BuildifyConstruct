@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Slab" ALTER COLUMN "totalVolume" SET DATA TYPE DOUBLE PRECISION;
