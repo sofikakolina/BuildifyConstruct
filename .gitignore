@@ -36,4 +36,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/app/api/python/code/models/
+/src/app/api/python/code/models/*.ifc
