@@ -102,6 +102,10 @@ model Project {
   ifc       IFC[] // IFC, привязанные к проекту
   slabs     Slab[]
   columns   Column[]
+  doors     Door[]
+  windows   Window[]
+  beams     Beam[]
+  stairs    Stair[]
 }
 
 model Document {
@@ -249,6 +253,179 @@ model ColumnElement {
   updatedAt   DateTime @updatedAt
   
   @@map("column_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+
+
+model Door {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalArea   Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  doors       DoorElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalArea])
+}
+
+model DoorElement {
+  id          String   @id @default(cuid())
+  doorId    String
+  door        Door     @relation(fields: [doorId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  elevation   Float?   // Для точной сортировки уровней
+  area        Float?
+  size        Float?
+  height      Float?
+  width       Float?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("door_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+model Window {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalArea   Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  windows     WindowElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalArea])
+}
+
+model WindowElement {
+  id          String   @id @default(cuid())
+  windowId    String
+  window      Window     @relation(fields: [windowId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  elevation   Float?   // Для точной сортировки уровней
+  area        Float?
+  size        Float?
+  height      Float?
+  width       Float?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("window_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+
+model Beam {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume   Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  windows     BeamElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalVolume])
+}
+
+model BeamElement {
+  id          String   @id @default(cuid())
+  beamId      String
+  beam        Beam     @relation(fields: [beamId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  material    String? 
+  elevation   Float?   // Для точной сортировки уровней
+  volume      Float?
+  size        Float?
+  height      Float?
+  width       Float?
+  length      Float?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("beam_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+
+
+model Stair {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  stairs     StairElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalVolume])
+}
+
+model StairElement {
+  id          String   @id @default(cuid())
+  stairId     String
+  stair       Stair     @relation(fields: [stairId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  material    String? 
+  elevation   Float?   // Для точной сортировки уровней
+  volume      Float?
+  size        Float?
+  height      Float?
+  width       Float?
+  length      Float?
+  ifcType     String?  @map("IFCType")
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("stair_elements")
   @@index([level])
   @@index([elevation])
   @@index([type])

@@ -140,8 +140,8 @@ def main():
         # print("\nДетализированная информация по этажам:")
         for level, stats in sorted(analysis['level_stats'].items()):
             # print(f"\n=== Этаж: {level} ===")
-            print(f"Всего дверей: {stats['count']}")
-            print(f"Общая площадь дверей: {stats['total_area']:.2f} м²")
+            # print(f"Всего дверей: {stats['count']}")
+            # print(f"Общая площадь дверей: {stats['total_area']:.2f} м²")
             # print(f"Типы дверей: {', '.join(stats['types']) if stats['types'] else 'N/A'}")
 
             # print("\nСписок дверей на этаже:")
@@ -154,7 +154,8 @@ def main():
                 print(f"    Уровень: {level}")
                 print(f"    Отметка уровня: {door_elevation} м")
                 if door['width'] and door['height']:
-                    print(f"    Размеры: {door['width']} x {door['height']} мм")
+                    print(f"    Ширина: {door['width']}")
+                    print(f"    Высота: {door['height']}")
                     print(f"    Площадь: {door['area']:.2f} м²")
                 else:
                     print("    Размеры: N/A")

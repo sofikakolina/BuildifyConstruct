@@ -36,7 +36,7 @@ export async function GET() {
     
     // 2. Get absolute paths
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
-    const scriptPath = path.join(baseDir, 'code', '17_02_2025_door.py');
+    const scriptPath = path.join(baseDir, 'code', '17_02_2025_window.py');
     const modelPath = path.join(baseDir, 'code', 'models', 'КолдинТЭ_2-2_revit.ifc');
 
     // 3. Verify files exist
@@ -71,7 +71,7 @@ export async function GET() {
     console.log(output)
     console.log(levelsData)
     // Create main Slab record
-    const slab = await prisma.door.create({
+    const slab = await prisma.window.create({
       data: {
         name: "Slab Analysis",
         totalCount,
@@ -83,9 +83,9 @@ export async function GET() {
     // Create all SlabElement records with elevation
     const createPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(element => 
-        prisma.doorElement.create({
+        prisma.windowElement.create({
           data: {
-            doorId: slab.id,
+            windowId: slab.id,
             name: element.name,
             globalId: element.globalId,
             type: element.type,
@@ -177,7 +177,7 @@ function parsePythonOutput(output: string): {
       }
   
       // Start parsing a new slab element
-      if (line.startsWith("Дверь") && line.includes(":")) {
+      if (line.startsWith("Окно") && line.includes(":")) {
         currentElement = {
           level: currentLevel?.level || 'Unknown Level',
           elevation: currentLevel?.elevation
@@ -212,7 +212,7 @@ function parsePythonOutput(output: string): {
         }
         
         // When we hit an empty line or next element, save the current element
-        if (line === "" || i === lines.length - 1 || lines[i+1].trim().startsWith("Дверь")) {
+        if (line === "" || i === lines.length - 1 || lines[i+1].trim().startsWith("Окно")) {
           if (currentElement.name && currentElement.globalId && currentElement.type && currentElement.area !== undefined && currentElement.width !== undefined && currentElement.height !== undefined) {
             // Find or create the level in levelsData
             let levelData = levelsData.find(l => l.level === currentElement?.level);

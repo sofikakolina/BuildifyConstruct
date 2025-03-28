@@ -28,30 +28,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.17_02_2025_column (1).executor": "Run",
-    "Python.17_02_2025_count_column.executor": "Run",
-    "Python.17_02_2025_door.executor": "Run",
-    "Python.17_02_2025_roof.executor": "Run",
-    "Python.17_02_2025_slab (1).executor": "Run",
-    "Python.17_02_2025_slab.executor": "Run",
-    "Python.17_02_2025_stair.executor": "Run",
-    "Python.17_02_2025_window.executor": "Run",
-    "Python.22.02.2025_beam.executor": "Run",
-    "Python.25_03_2025_railing.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/sofikakolina/Documents/Проекты/диплом/BuildifyConstruct/src/app/api/python",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.17_02_2025_column (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_count_column.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_door.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_roof.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_slab (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_slab.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_stair.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_window.executor&quot;: &quot;Run&quot;,
+    &quot;Python.22.02.2025_beam.executor&quot;: &quot;Run&quot;,
+    &quot;Python.25_03_2025_railing.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/sofikakolina/Documents/Проекты/диплом/BuildifyConstruct/src/app/api/python&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.17_02_2025_door">
     <configuration name="17_02_2025_column (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pythonIFCReader" />
@@ -194,7 +194,7 @@
       <option name="presentableId" value="Default" />
       <updated>1742889262944</updated>
       <workItem from="1742889263986" duration="4313000" />
-      <workItem from="1742980171525" duration="10115000" />
+      <workItem from="1742980171525" duration="10244000" />
     </task>
     <servers />
   </component>

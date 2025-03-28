@@ -22,7 +22,7 @@ export default function Home() {
     // Запрашиваем данные с API
     const fetchProjects = async () => {
       try {
-        axios.get("api/python/doors")
+        axios.get("api/python/stairs")
         const response = await fetch("/api/dashboard/projects");
         if (!response.ok) {
           throw new Error("Failed to fetch projects");

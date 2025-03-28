@@ -9,9 +9,11 @@ const prisma = new PrismaClient();
 interface SlabLevelData {
   level: string;
   count: number;
-  area: number;
+  volume: number;
   width: number;
   height: number;
+  length: number;
+  material?: string;
   elevation?: number;
   types: string[];
   elements: SlabElementData[];
@@ -21,9 +23,11 @@ interface SlabElementData {
   name: string;
   globalId: string;
   type: string;
-  area: number;
+  volume: number;
   width: number;
   height: number;
+  length: number;
+  material?: string;
   level: string;
   elevation?: number;
 }
@@ -36,8 +40,8 @@ export async function GET() {
     
     // 2. Get absolute paths
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
-    const scriptPath = path.join(baseDir, 'code', '17_02_2025_door.py');
-    const modelPath = path.join(baseDir, 'code', 'models', 'КолдинТЭ_2-2_revit.ifc');
+    const scriptPath = path.join(baseDir, 'code', '22.02.2025_beam.py');
+    const modelPath = path.join(baseDir, 'code', 'models', 'Блок_1.ifc');
 
     // 3. Verify files exist
     if (!fs.existsSync(scriptPath)) {
@@ -67,15 +71,15 @@ export async function GET() {
     });
 
     // 5. Parse and store results
-    const { totalCount, totalArea, levelsData } = parsePythonOutput(output);
+    const { totalCount, totalVolume, levelsData } = parsePythonOutput(output);
     console.log(output)
     console.log(levelsData)
     // Create main Slab record
-    const slab = await prisma.door.create({
+    const slab = await prisma.beam.create({
       data: {
         name: "Slab Analysis",
         totalCount,
-        totalArea,
+        totalVolume,
         description: `Generated from ${path.basename(modelPath)}`,
       },
     });
@@ -83,17 +87,19 @@ export async function GET() {
     // Create all SlabElement records with elevation
     const createPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(element => 
-        prisma.doorElement.create({
+        prisma.beamElement.create({
           data: {
-            doorId: slab.id,
+            beamId: slab.id,
             name: element.name,
             globalId: element.globalId,
             type: element.type,
             level: element.level,
             elevation: element.elevation,
-            area: element.area,
+            volume: element.volume,
             width: element.width,
             height: element.height,
+            length: element.length,
+            material: element.material,
           }
         })
       )
@@ -122,12 +128,12 @@ export async function GET() {
 }
 function parsePythonOutput(output: string): {
     totalCount: number;
-    totalArea: number;
+    totalVolume: number;
     levelsData: SlabLevelData[];
   } {
     const lines = output.split("\n");
     let totalCount = 0;
-    let totalArea = 0;
+    let totalVolume = 0;
     const levelsData: SlabLevelData[] = [];
     let currentLevel: SlabLevelData | null = null;
     let currentElement: Partial<SlabElementData> | null = null;
@@ -136,15 +142,15 @@ function parsePythonOutput(output: string): {
       const line = lines[i].trim();
   
       // Parse total count
-      if (line.startsWith("Общее количество перекрытий:")) {
+      if (line.startsWith("Общее количество балок:")) {
         totalCount = parseInt(line.split(":")[1].trim());
         continue;
       }
       
       // Parse total volume
-      if (line.startsWith("Общий объем перекрытий:")) {
+      if (line.startsWith("Общий объем всех балок:")) {
         const volumeStr = line.split(":")[1].trim().split(" ")[0];
-        totalArea = parseFloat(volumeStr);
+        totalVolume = parseFloat(volumeStr);
         continue;
       }
       
@@ -165,9 +171,11 @@ function parsePythonOutput(output: string): {
         currentLevel = {
           level: levelName,
           count: 0,
-          area: 0,
+          volume: 0,
           width: 0,
           height: 0,
+          length: 0,
+          material:"",
           elevation,
           types: [],
           elements: [],
@@ -177,7 +185,7 @@ function parsePythonOutput(output: string): {
       }
   
       // Start parsing a new slab element
-      if (line.startsWith("Дверь") && line.includes(":")) {
+      if (line.startsWith("Балка") && line.includes(":")) {
         currentElement = {
           level: currentLevel?.level || 'Unknown Level',
           elevation: currentLevel?.elevation
@@ -193,15 +201,21 @@ function parsePythonOutput(output: string): {
           currentElement.globalId = line.split(":")[1].trim();
         } else if (line.includes("Тип:")) {
           currentElement.type = line.split(":")[1].trim();
-        } else if (line.includes("Площадь:")) {
+        } else if (line.includes("Объем:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
-          currentElement.area = parseFloat(volumeStr);
+          currentElement.volume = parseFloat(volumeStr);
         } else if (line.includes("Высота:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.height = parseFloat(volumeStr);
         } else if (line.includes("Ширина:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.width = parseFloat(volumeStr);
+        } else if (line.includes("Длина:")) {
+          const volumeStr = line.split(":")[1].trim().split(" ")[0];
+          currentElement.length = parseFloat(volumeStr);
+        } else if (line.includes("Материалы:")) {
+          const volumeStr = line.split(":")[1].trim().split(" ")[0];
+          currentElement.material = line.split(":")[1].trim();
         } else if (line.includes("Уровень:")) {
           currentElement.level = line.split(":")[1].trim();
         } else if (line.includes("Отметка уровня:")) {
@@ -212,17 +226,19 @@ function parsePythonOutput(output: string): {
         }
         
         // When we hit an empty line or next element, save the current element
-        if (line === "" || i === lines.length - 1 || lines[i+1].trim().startsWith("Дверь")) {
-          if (currentElement.name && currentElement.globalId && currentElement.type && currentElement.area !== undefined && currentElement.width !== undefined && currentElement.height !== undefined) {
+        if (line === "" || i === lines.length - 1 || lines[i+1].trim().startsWith("Балка")) {
+          if (currentElement.name && currentElement.globalId && currentElement.type && currentElement.volume !== undefined && currentElement.width !== undefined && currentElement.height !== undefined && currentElement.length !== undefined ) {
             // Find or create the level in levelsData
             let levelData = levelsData.find(l => l.level === currentElement?.level);
             if (!levelData) {
               levelData = {
                 level: currentElement.level || 'Unknown Level',
                 count: 0,
-                area: 0,
+                volume: 0,
                 width: 0,
                 height: 0,
+                length: 0,
+                material: "",
                 elevation: currentElement.elevation,
                 types: [],
                 elements: []
@@ -235,16 +251,18 @@ function parsePythonOutput(output: string): {
               name: currentElement.name,
               globalId: currentElement.globalId,
               type: currentElement.type,
-              area: currentElement.area,
+              volume: currentElement.volume,
               width: currentElement.width,
               height: currentElement.height,
+              length: currentElement.length,
+              material: currentElement.material,
               level: currentElement.level || 'Unknown Level',
               elevation: currentElement.elevation
             });
             
             // Update level stats
             levelData.count += 1;
-            levelData.area += currentElement.area;
+            levelData.volume += currentElement.volume;
             if (!levelData.types.includes(currentElement.type)) {
               levelData.types.push(currentElement.type);
             }
@@ -254,5 +272,5 @@ function parsePythonOutput(output: string): {
       }
     }
   
-    return { totalCount, totalArea, levelsData };
+    return { totalCount, totalVolume, levelsData };
   }
