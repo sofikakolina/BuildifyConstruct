@@ -71,7 +71,6 @@ model User {
   tasks          Task[]    @relation("AssignedTasks")
 }
 
- 
 model VerificationToken {
   id String @id @default(cuid())
   identifier String?
@@ -86,7 +85,6 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
-
 
 model Project {
   id        String   @id @default(cuid())
@@ -106,6 +104,8 @@ model Project {
   windows   Window[]
   beams     Beam[]
   stairs    Stair[]
+  railings  Railing[]
+  walls     Wall[]
 }
 
 model Document {
@@ -119,6 +119,7 @@ model Document {
   projectId String
   createdAt DateTime @default(now())
 }
+
 model paymentDocument {
   id        String   @id @default(cuid())
   name      String
@@ -161,7 +162,6 @@ model Task {
   targetEnd        DateTime?      
 }
 
-
 enum TaskStatus {
   Todo
   Pause
@@ -174,7 +174,6 @@ enum OrderPriority {
   Normal
   Rush
 }
-
 
 model Slab {
   id          String        @id @default(cuid())
@@ -258,8 +257,6 @@ model ColumnElement {
   @@index([type])
 }
 
-
-
 model Door {
   id          String        @id @default(cuid())
   name        String
@@ -342,7 +339,6 @@ model WindowElement {
   @@index([type])
 }
 
-
 model Beam {
   id          String        @id @default(cuid())
   name        String
@@ -386,8 +382,6 @@ model BeamElement {
   @@index([type])
 }
 
-
-
 model Stair {
   id          String        @id @default(cuid())
   name        String
@@ -398,7 +392,7 @@ model Stair {
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  stairs     StairElement[]
+  stairs      StairElement[]
   
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
@@ -416,11 +410,10 @@ model StairElement {
   material    String? 
   elevation   Float?   // Для точной сортировки уровней
   volume      Float?
-  size        Float?
-  height      Float?
   width       Float?
-  length      Float?
-  ifcType     String?  @map("IFCType")
+  stepHeight  Float?
+  stepLength  Float?
+  numberOfSteps  Int?
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -429,4 +422,110 @@ model StairElement {
   @@index([level])
   @@index([elevation])
   @@index([type])
+}
+
+model Railing {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalLength Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  railings    RailingElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalCount])
+  @@index([totalLength])
+}
+
+model RailingElement {
+  id          String   @id @default(cuid())
+  railingId   String
+  stair       Railing  @relation(fields: [railingId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  material    String? 
+  elevation   Float?
+  volume      Float?
+  height      Float?
+  length      Float?
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("railing_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+
+model Wall {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume Float         @default(0)
+  totalArea Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  railings    WallElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalVolume])
+  @@index([totalCount])
+  @@index([totalArea])
+}
+
+model WallElement {
+  id          String   @id @default(cuid())
+  wallId      String
+  wall        Wall  @relation(fields: [wallId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  materials   WallMaterial[] 
+  elevation   Float?
+  volume      Float?
+  area        Float?
+  height      Float?
+  length      Float?
+  width       Float?
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("wall_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+model WallMaterial {
+  id              String      @id @default(cuid())
+  wallElementId   String
+  wallElement     WallElement @relation(fields: [wallElementId], references: [id])
+  name            String
+  type            String?
+  thickness       Float?      // Толщина в мм
+  volume          Float?      // Объем в м³
+  area            Float?      // Площадь в м²
+  elevation       Float?      // Отметка уровня
+  properties      Json?       // Дополнительные свойства
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("wall_materials")
+  @@index([name])
+  @@index([type])
+  @@index([elevation])
+  @@index([wallElementId])
 }

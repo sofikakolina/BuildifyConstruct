@@ -5,27 +5,29 @@ from collections import defaultdict
 import sys
 
 
-def get_level_name(element):
-    """Получает название уровня для элемента."""
+def get_level_name_and_elevation(element):
+    """Получает название уровня и его отметку для элемента."""
     for rel in getattr(element, 'ContainedInStructure', []):
         if rel.is_a('IfcRelContainedInSpatialStructure'):
-            return getattr(rel.RelatingStructure, 'Name', 'Unknown Level')
-    return 'Unknown Level'
-
-
-def get_level_elevation(level):
-    """Получает отметку уровня из его свойств."""
-    if hasattr(level, 'Elevation'):
-        return level.Elevation
-    elif hasattr(level, 'ObjectPlacement'):
-        placement = level.ObjectPlacement
-        while placement:
-            if placement.is_a('IfcLocalPlacement'):
-                if placement.RelativePlacement.is_a('IfcAxis2Placement3D'):
-                    location = placement.RelativePlacement.Location
-                    return location.Coordinates[2]
-            placement = getattr(placement, 'PlacementRelTo', None)
-    return None
+            level = rel.RelatingStructure
+            level_name = getattr(level, 'Name', 'Unknown Level')
+            
+            # Получаем отметку уровня
+            elevation = None
+            if hasattr(level, 'Elevation'):
+                elevation = level.Elevation
+            elif hasattr(level, 'ObjectPlacement'):
+                placement = level.ObjectPlacement
+                while placement:
+                    if placement.is_a('IfcLocalPlacement'):
+                        if placement.RelativePlacement.is_a('IfcAxis2Placement3D'):
+                            location = placement.RelativePlacement.Location
+                            elevation = location.Coordinates[2]
+                            break
+                    placement = getattr(placement, 'PlacementRelTo', None)
+            
+            return level_name, elevation
+    return 'Unknown Level', None
 
 
 def calculate_geometry_volume(stair):
@@ -55,7 +57,8 @@ def get_stairs_analysis(ifc_file):
         'count': 0,
         'types': set(),
         'stairs': [],
-        'total_volume': 0.0
+        'total_volume': 0.0,
+        'elevation': None
     })
 
     stairs = ifc_file.by_type('IfcStair') + ifc_file.by_type('IfcStairFlight')
@@ -92,14 +95,8 @@ def get_stairs_analysis(ifc_file):
         # Используем объем из геометрии, если он больше нуля, иначе из параметров
         volume = geom_volume if geom_volume > 0 else param_volume
 
-        # Определение уровня
-        level = get_level_name(stair)
-        elevation = None
-        for rel in getattr(stair, 'ContainedInStructure', []):
-            if rel.is_a('IfcRelContainedInSpatialStructure'):
-                level_obj = rel.RelatingStructure
-                elevation = get_level_elevation(level_obj)
-                break
+        # Определение уровня и отметки
+        level, elevation = get_level_name_and_elevation(stair)
 
         stair_data = {
             'name': stair_name,
@@ -165,7 +162,7 @@ def main():
                 print(f"    Объем бетона: {stair['volume']:.3f} м³ (источник: {stair['volume_source']})")
                 print(f"    Уровень: {stair['level']}")
                 if stair['elevation'] is not None:
-                    print(f"    Отметка уровня: {stair['elevation']:.2f} м")
+                    print(f"    Отметка уровня лестницы: {stair['elevation']:.2f} м")
 
 
     except Exception as e:

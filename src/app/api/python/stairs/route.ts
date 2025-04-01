@@ -13,7 +13,7 @@ interface SlabLevelData {
   width: number;
   height: number;
   length: number;
-  material?: string;
+  numberOfSteps: number;
   elevation?: number;
   types: string[];
   elements: SlabElementData[];
@@ -27,7 +27,7 @@ interface SlabElementData {
   width: number;
   height: number;
   length: number;
-  material?: string;
+  numberOfSteps: number;
   level: string;
   elevation?: number;
 }
@@ -75,7 +75,7 @@ export async function GET() {
     console.log(output)
     console.log(levelsData)
     // Create main Slab record
-    const slab = await prisma.beam.create({
+    const slab = await prisma.stair.create({
       data: {
         name: "Slab Analysis",
         totalCount,
@@ -87,9 +87,9 @@ export async function GET() {
     // Create all SlabElement records with elevation
     const createPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(element => 
-        prisma.beamElement.create({
+        prisma.stairElement.create({
           data: {
-            beamId: slab.id,
+            stairId: slab.id,
             name: element.name,
             globalId: element.globalId,
             type: element.type,
@@ -97,9 +97,9 @@ export async function GET() {
             elevation: element.elevation,
             volume: element.volume,
             width: element.width,
-            height: element.height,
-            length: element.length,
-            material: element.material,
+            stepHeight: element.height,
+            stepLength: element.length,
+            numberOfSteps: element.numberOfSteps,
           }
         })
       )
@@ -142,13 +142,13 @@ function parsePythonOutput(output: string): {
       const line = lines[i].trim();
   
       // Parse total count
-      if (line.startsWith("Общее количество балок:")) {
+      if (line.startsWith("Общее количество лестниц:")) {
         totalCount = parseInt(line.split(":")[1].trim());
         continue;
       }
       
       // Parse total volume
-      if (line.startsWith("Общий объем всех балок:")) {
+      if (line.startsWith("Общий объем бетона для лестниц:")) {
         const volumeStr = line.split(":")[1].trim().split(" ")[0];
         totalVolume = parseFloat(volumeStr);
         continue;
@@ -175,7 +175,7 @@ function parsePythonOutput(output: string): {
           width: 0,
           height: 0,
           length: 0,
-          material:"",
+          numberOfSteps:0,
           elevation,
           types: [],
           elements: [],
@@ -185,7 +185,7 @@ function parsePythonOutput(output: string): {
       }
   
       // Start parsing a new slab element
-      if (line.startsWith("Балка") && line.includes(":")) {
+      if (line.startsWith("Лестница") && line.includes(":")) {
         currentElement = {
           level: currentLevel?.level || 'Unknown Level',
           elevation: currentLevel?.elevation
@@ -201,24 +201,24 @@ function parsePythonOutput(output: string): {
           currentElement.globalId = line.split(":")[1].trim();
         } else if (line.includes("Тип:")) {
           currentElement.type = line.split(":")[1].trim();
-        } else if (line.includes("Объем:")) {
+        } else if (line.includes("Объем бетона:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.volume = parseFloat(volumeStr);
-        } else if (line.includes("Высота:")) {
+        } else if (line.includes("Высота подступенка:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.height = parseFloat(volumeStr);
+        } else if (line.includes("Длина ступени:")) {
+          const volumeStr = line.split(":")[1].trim().split(" ")[0];
+          currentElement.length = parseFloat(volumeStr);
         } else if (line.includes("Ширина:")) {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.width = parseFloat(volumeStr);
-        } else if (line.includes("Длина:")) {
-          const volumeStr = line.split(":")[1].trim().split(" ")[0];
-          currentElement.length = parseFloat(volumeStr);
-        } else if (line.includes("Материалы:")) {
-          const volumeStr = line.split(":")[1].trim().split(" ")[0];
-          currentElement.material = line.split(":")[1].trim();
+        } else if (line.includes("Количество ступеней:")) {
+          const numberOfStr = line.split(":")[1].trim().split(" ")[0];
+          currentElement.numberOfSteps = parseFloat(numberOfStr);
         } else if (line.includes("Уровень:")) {
           currentElement.level = line.split(":")[1].trim();
-        } else if (line.includes("Отметка уровня:")) {
+        } else if (line.includes("Отметка уровня лестницы:")) {
           const elevationStr = line.split(":")[1].trim().split(" ")[0];
           if (elevationStr !== "N/A") {
             currentElement.elevation = parseFloat(elevationStr);
@@ -227,7 +227,7 @@ function parsePythonOutput(output: string): {
         
         // When we hit an empty line or next element, save the current element
         if (line === "" || i === lines.length - 1 || lines[i+1].trim().startsWith("Балка")) {
-          if (currentElement.name && currentElement.globalId && currentElement.type && currentElement.volume !== undefined && currentElement.width !== undefined && currentElement.height !== undefined && currentElement.length !== undefined ) {
+          if (currentElement.name && currentElement.globalId && currentElement.type && currentElement.volume !== undefined && currentElement.width !== undefined && currentElement.height !== undefined && currentElement.length !== undefined && currentElement.numberOfSteps !== undefined) {
             // Find or create the level in levelsData
             let levelData = levelsData.find(l => l.level === currentElement?.level);
             if (!levelData) {
@@ -238,7 +238,7 @@ function parsePythonOutput(output: string): {
                 width: 0,
                 height: 0,
                 length: 0,
-                material: "",
+                numberOfSteps: 0,
                 elevation: currentElement.elevation,
                 types: [],
                 elements: []
@@ -255,7 +255,7 @@ function parsePythonOutput(output: string): {
               width: currentElement.width,
               height: currentElement.height,
               length: currentElement.length,
-              material: currentElement.material,
+              numberOfSteps: currentElement.numberOfSteps,
               level: currentElement.level || 'Unknown Level',
               elevation: currentElement.elevation
             });
