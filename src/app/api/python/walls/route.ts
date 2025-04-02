@@ -254,12 +254,12 @@ function parsePythonOutput(output: string): {
           let materialArea = 0;
           
           for (const part of materialParts.slice(1)) {
-            if (part.includes("Объем:")) {
-              const volMatch = part.match(/Объем:\s*([\d.]+)\s*м³/);
+            if (part.includes("Объем_Материала:")) {
+              const volMatch = part.match(/Объем_Материала:\s*([\d.]+)\s*м³/);
               if (volMatch) materialVolume = parseFloat(volMatch[1]);
             }
-            if (part.includes("Площадь:")) {
-              const areaMatch = part.match(/Площадь:\s*([\d.]+)\s*м²/);
+            if (part.includes("Площадь_Материала:")) {
+              const areaMatch = part.match(/Площадь_Материала:\s*([\d.]+)\s*м²/);
               if (areaMatch) materialArea = parseFloat(areaMatch[1]);
             }
           }

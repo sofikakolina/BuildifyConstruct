@@ -214,7 +214,7 @@ function parsePythonOutput(output: string): {
           const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.length = parseFloat(volumeStr);
         } else if (line.includes("Материалы:")) {
-          const volumeStr = line.split(":")[1].trim().split(" ")[0];
+          // const volumeStr = line.split(":")[1].trim().split(" ")[0];
           currentElement.material = line.split(":")[1].trim();
         } else if (line.includes("Уровень:")) {
           currentElement.level = line.split(":")[1].trim();

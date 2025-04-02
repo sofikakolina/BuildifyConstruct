@@ -127,7 +127,7 @@ function parsePythonOutput(output: string): {
   let totalCount = 0;
   let totalLength = 0;
   const levelsData: RailingLevelData[] = [];
-  let currentLevel: RailingLevelData | null = null;
+  // let currentLevel: RailingLevelData | null = null;
   let currentElement: Partial<RailingElementData> | null = null;
 
   for (let i = 0; i < lines.length; i++) {
