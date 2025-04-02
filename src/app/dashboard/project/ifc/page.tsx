@@ -18,7 +18,6 @@ const Page = () => {
   const [ifcFile, setIfcFile] = useState<IFC | null>(null);
   const [selectedIFC, setSelectedIFC] = useState<IFC | null>(null);
   const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -80,16 +79,79 @@ const Page = () => {
     setSelectedIFC(ifc); // Устанавливаем выбранный IFC-файл для просмотра
   };
 
+  const handleMaterialExport = async () => {
+    if (!ifcFile?.path) {
+      toast.error('IFC path not found');
+      return;
+    }
+  
+    const loadingToast = toast.loading('Экспорт материалов...');
+  
+    try {
+      const endpoints = [
+        "/api/python/roofs",
+        "/api/python/walls",
+        "/api/python/beams",
+        "/api/python/railings",
+        "/api/python/columns",
+        "/api/python/doors",
+        "/api/python/slabs",
+        "/api/python/stairs",
+        "/api/python/windows"
+      ];
+  
+      // Функция для выполнения запроса с повторением при ошибках
+      const fetchWithRetry = async (endpoint: string, retries = 5) => {
+        try {
+          const response = await axios.get(endpoint, {
+            params: { ifcPath: ifcFile.path },
+            timeout: 12000000
+          });
+          return response;
+        } catch (error) {
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Ждем 3 секунды
+            console.log(`Повторная попытка для ${endpoint}, осталось попыток: ${retries - 1}`);
+            return fetchWithRetry(endpoint, retries - 1);
+          }
+          throw error; // Если попытки закончились, пробрасываем ошибку дальше
+        }
+      };
+  
+      // Выполняем запросы последовательно
+      for (const endpoint of endpoints) {
+        await fetchWithRetry(endpoint);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Небольшая задержка между разными эндпоинтами
+      }
+      
+      toast.success('Материалы успешно экспортированы!', { id: loadingToast });
+    } catch (error) {
+      console.error('Export failed:', error);
+      
+      let errorMessage = 'Ошибка при экспорте материалов';
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+  
+      toast.error(errorMessage, { id: loadingToast });
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col p-4">
         <h1 className="mb-4 font-bold text-gold text-2xl">IFC-файлы</h1>
-        <input
-          type="file"
-          accept=".ifc"
-          onChange={handleFileUpload}
-          className="mb-4"
-        />
+        <div className="flex justify-between items-center">
+          <input
+            type="file"
+            accept=".ifc"
+            onChange={handleFileUpload}
+            className=""
+          />
+          <button onClick={handleMaterialExport} className="bg-gold px-5 py-2 rounded-lg">Экспортировать материалы</button>
+        </div>
       </div>
 
       <div className="p-4">

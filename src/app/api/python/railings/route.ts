@@ -33,10 +33,13 @@ export async function GET() {
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
     
     // 2. Get absolute paths
+    
+    const ifc = await prisma.iFC.findFirstOrThrow();
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
+    const baseDirModel = path.join(process.cwd(), 'public');
+    const modelPath = path.join(baseDirModel, ifc.path);
     const scriptPath = path.join(baseDir, 'code', '25_03_2025_railing.py');
-    const modelPath = path.join(baseDir, 'code', 'models', 'КолдинТЭ_2-2_revit.ifc');
-
+    
     // 3. Verify files exist
     if (!fs.existsSync(scriptPath)) {
       throw new Error(`Python script not found at: ${scriptPath}`);
@@ -65,7 +68,8 @@ export async function GET() {
 
     // 5. Parse and store results
     const { totalCount, totalLength, levelsData } = parsePythonOutput(output);
-    
+    await prisma.railingElement.deleteMany({ where: {} });
+    await prisma.railing.deleteMany({ where: {} });
     // Create main Railing record
     const railing = await prisma.railing.create({
       data: {

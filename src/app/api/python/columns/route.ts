@@ -30,10 +30,11 @@ export async function GET() {
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
     
     // 2. Get absolute paths
+    const ifc = await prisma.iFC.findFirstOrThrow();
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
+    const baseDirModel = path.join(process.cwd(), 'public');
+    const modelPath = path.join(baseDirModel, ifc.path);
     const scriptPath = path.join(baseDir, 'code', '17_02_2025_column.py');
-    const modelPath = path.join(baseDir, 'code', 'models', 'КолдинТЭ_2-2_revit.ifc');
-
     // 3. Verify files exist
     if (!fs.existsSync(scriptPath)) {
       throw new Error(`Python script not found at: ${scriptPath}`);
@@ -63,8 +64,8 @@ export async function GET() {
 
     // 5. Parse and store results
     const { totalCount, totalVolume, levelsData } = parsePythonOutput(output);
-    console.log(output)
-    console.log(levelsData)
+    await prisma.columnElement.deleteMany({ where: {} });
+    await prisma.column.deleteMany({ where: {} });
     // Create main Slab record
     const column = await prisma.column.create({
       data: {

@@ -40,16 +40,16 @@ interface WallMaterialData {
 
 export async function GET() {
   try {
+    console.log("first")
     // 1. Configure paths
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-    
-    // 2. Get absolute paths
-    const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');    
+
     const ifc = await prisma.iFC.findFirstOrThrow();
+    const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
     const baseDirModel = path.join(process.cwd(), 'public');
-    const scriptPath = path.join(baseDir, 'code', '16_02_2025_wall_materials.py');
     const modelPath = path.join(baseDirModel, ifc.path);
-    
+    const scriptPath = path.join(baseDir, 'code', '17_02_2025_roof.py');
+
     // 3. Verify files exist
     if (!fs.existsSync(scriptPath)) {
       throw new Error(`Python script not found at: ${scriptPath}`);
@@ -74,16 +74,14 @@ export async function GET() {
       maxBuffer: 1024 * 1024 * 10, // 10MB buffer
       env: env
     });
-
     // 5. Parse and store results
     const { totalCount, totalVolume, totalArea, levelsData } = parsePythonOutput(output);
     // Удаляем данные в правильном порядке, учитывая ограничения внешних ключей
-    await prisma.wallMaterial.deleteMany({ where: {} });
-    await prisma.wallElement.deleteMany({ where: {} });
-    await prisma.wall.deleteMany({ where: {} });
-
+    await prisma.roofMaterial.deleteMany({ where: {} });
+    await prisma.roofElement.deleteMany({ where: {} });
+    await prisma.roof.deleteMany({ where: {} });
     // Create main Wall record
-    const wall = await prisma.wall.create({
+    const wall = await prisma.roof.create({
       data: {
         name: "Wall Analysis",
         totalCount,
@@ -97,9 +95,9 @@ export async function GET() {
     const createElementPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(async (element) => {
         try {
-          const createdElement = await prisma.wallElement.create({
+          const createdElement = await prisma.roofElement.create({
             data: {
-              wallId: wall.id,
+              roofId: wall.id,
               name: element.name,
               globalId: element.globalId,
               type: element.type,
@@ -116,9 +114,9 @@ export async function GET() {
           // Create materials for this element
           if (element.materials && element.materials.length > 0) {
             const materialPromises = element.materials.map(material => 
-              prisma.wallMaterial.create({
+              prisma.roofMaterial.create({
                 data: {
-                  wallElementId: createdElement.id,
+                  roofElementId: createdElement.id,
                   name: material.name,
                   type: material.type,
                   thickness: material.thickness,
@@ -179,21 +177,21 @@ function parsePythonOutput(output: string): {
     if (!line) continue;
 
     // Parse total counts
-    if (line.startsWith("Общее количество стен:")) {
+    if (line.startsWith("Количество крыш:")) {
       totalCount = parseInt(line.split(":")[1].trim());
       continue;
     }
-    if (line.startsWith("Общий объем всех стен:")) {
+    if (line.startsWith("Общий объем:")) {
       totalVolume = parseFloat(line.split(":")[1].trim().split(" ")[0]);
       continue;
     }
-    if (line.startsWith("Общая площадь всех стен:")) {
+    if (line.startsWith("Общая площадь:")) {
       totalArea = parseFloat(line.split(":")[1].trim().split(" ")[0]);
       continue;
     }
 
     // Start new wall element
-    if (line.startsWith("Стена") && line.includes(":")) {
+    if (line.startsWith("Крыша") && line.includes(":")) {
       // Finalize previous element if exists
       if (currentElement && currentElement.name && currentElement.globalId) {
         addElementToLevel(currentElement, currentMaterials, levelsData);

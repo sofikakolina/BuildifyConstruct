@@ -106,6 +106,7 @@ model Project {
   stairs    Stair[]
   railings  Railing[]
   walls     Wall[]
+  roofs     Roof[]
 }
 
 model Document {
@@ -138,8 +139,8 @@ model IFC {
   name      String
   title     String
   path      String   @unique
-  project   Project  @relation(fields: [projectId], references: [id])
   projectId String 
+  project   Project  @relation(fields: [projectId], references: [id])
   createdAt DateTime @default(now())
 }
 
@@ -528,4 +529,69 @@ model WallMaterial {
   @@index([type])
   @@index([elevation])
   @@index([wallElementId])
+}
+
+model Roof {
+  id          String        @id @default(cuid())
+  name        String
+  totalCount  Int           @default(0)
+  totalVolume Float         @default(0)
+  totalArea Float         @default(0)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  railings    RoofElement[]
+  
+  // Добавляем индексы для часто используемых полей
+  @@index([totalVolume])
+  @@index([totalCount])
+  @@index([totalArea])
+}
+
+model RoofElement {
+  id          String   @id @default(cuid())
+  roofId      String
+  wall        Roof  @relation(fields: [roofId], references: [id])
+  name        String
+  globalId    String   @unique @map("GlobalId")
+  type        String
+  level       String? 
+  roofs       RoofMaterial[] 
+  elevation   Float?
+  volume      Float?
+  area        Float?
+  height      Float?
+  length      Float?
+  width       Float?
+  properties  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("roof_elements")
+  @@index([level])
+  @@index([elevation])
+  @@index([type])
+}
+
+model RoofMaterial {
+  id              String      @id @default(cuid())
+  roofElementId   String
+  roofElement     RoofElement @relation(fields: [roofElementId], references: [id])
+  name            String
+  type            String?
+  thickness       Float?      // Толщина в мм
+  volume          Float?      // Объем в м³
+  area            Float?      // Площадь в м²
+  elevation       Float?      // Отметка уровня
+  properties      Json?       // Дополнительные свойства
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("roof_materials")
+  @@index([name])
+  @@index([type])
+  @@index([elevation])
+  @@index([roofElementId])
 }

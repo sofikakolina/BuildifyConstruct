@@ -155,7 +155,7 @@ def get_walls_analysis(ifc_file):
             if mat['thickness']:
                 mat_str = f"{mat['name']} ({mat['thickness']:.0f} мм) - Объем_Материала: {mat['volume']:.3f} м³, Площадь_Материала: {mat['area']:.2f} м²"
             else:
-                mat_str = f"{mat['name']} - Объем: {mat['volume']:.3f} м³, Площадь: {mat['area']:.2f} м²"
+                mat_str = f"{mat['name']} - Объем_Материала: {mat['volume']:.3f} м³, Площадь_Материала: {mat['area']:.2f} м²"
             material_info.append(mat_str)
 
         # Сохраняем информацию о стене

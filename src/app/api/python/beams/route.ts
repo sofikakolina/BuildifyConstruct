@@ -39,9 +39,11 @@ export async function GET() {
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
     
     // 2. Get absolute paths
+    const ifc = await prisma.iFC.findFirstOrThrow();
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
+    const baseDirModel = path.join(process.cwd(), 'public');
+    const modelPath = path.join(baseDirModel, ifc.path);
     const scriptPath = path.join(baseDir, 'code', '22.02.2025_beam.py');
-    const modelPath = path.join(baseDir, 'code', 'models', 'Блок_1.ifc');
 
     // 3. Verify files exist
     if (!fs.existsSync(scriptPath)) {
@@ -72,8 +74,9 @@ export async function GET() {
 
     // 5. Parse and store results
     const { totalCount, totalVolume, levelsData } = parsePythonOutput(output);
-    console.log(output)
-    console.log(levelsData)
+    await prisma.beamElement.deleteMany({ where: {} });
+    await prisma.beam.deleteMany({ where: {} });
+
     // Create main Slab record
     const slab = await prisma.beam.create({
       data: {
@@ -83,7 +86,6 @@ export async function GET() {
         description: `Generated from ${path.basename(modelPath)}`,
       },
     });
-    console.log(levelsData)
     // Create all SlabElement records with elevation
     const createPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(element => 

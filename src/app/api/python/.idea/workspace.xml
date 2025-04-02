@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66c257e2-0f59-4e7f-afdd-115212c892f3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../../prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/16_02_2025_wall_materials.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/16_02_2025_wall_materials.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/17_02_2025_stair.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/17_02_2025_stair.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/25_03_2025_railing.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/25_03_2025_railing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stairs/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stairs/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../dashboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/17_02_2025_roof.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/17_02_2025_roof.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,32 +31,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.16_02_2025_wall_materials.executor": "Run",
-    "Python.17_02_2025_column (1).executor": "Run",
-    "Python.17_02_2025_count_column.executor": "Run",
-    "Python.17_02_2025_door.executor": "Run",
-    "Python.17_02_2025_roof.executor": "Run",
-    "Python.17_02_2025_slab (1).executor": "Run",
-    "Python.17_02_2025_slab.executor": "Run",
-    "Python.17_02_2025_stair.executor": "Run",
-    "Python.17_02_2025_window.executor": "Run",
-    "Python.22.02.2025_beam.executor": "Run",
-    "Python.25_03_2025_railing.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/sofikakolina/Documents/Проекты/диплом/BuildifyConstruct/src/app/api/python",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.16_02_2025_wall_materials.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_column (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_count_column.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_door.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_roof.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_slab (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_slab.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_stair.executor&quot;: &quot;Run&quot;,
+    &quot;Python.17_02_2025_window.executor&quot;: &quot;Run&quot;,
+    &quot;Python.22.02.2025_beam.executor&quot;: &quot;Run&quot;,
+    &quot;Python.25_03_2025_railing.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/sofikakolina/Documents/Проекты/диплом/BuildifyConstruct/src/app/api/python&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Python.16_02_2025_wall_materials">
+}</component>
+  <component name="RunManager" selected="Python.17_02_2025_roof">
     <configuration name="16_02_2025_wall_materials" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pythonIFCReader" />
       <option name="ENV_FILES" value="" />
@@ -154,7 +149,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="17_02_2025_slab (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="17_02_2025_roof" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pythonIFCReader" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -168,7 +163,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/17_02_2025_slab.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/17_02_2025_roof.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -179,11 +174,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.17_02_2025_roof" />
         <item itemvalue="Python.16_02_2025_wall_materials" />
         <item itemvalue="Python.17_02_2025_door" />
         <item itemvalue="Python.17_02_2025_column (1)" />
         <item itemvalue="Python.17_02_2025_column" />
-        <item itemvalue="Python.17_02_2025_slab (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -205,6 +200,7 @@
       <workItem from="1742889263986" duration="4313000" />
       <workItem from="1742980171525" duration="10244000" />
       <workItem from="1743509072163" duration="777000" />
+      <workItem from="1743599430790" duration="1033000" />
     </task>
     <servers />
   </component>
@@ -212,7 +208,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/python$17_02_2025_roof.coverage" NAME="17_02_2025_roof Coverage Results" MODIFIED="1742930831038" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/python$17_02_2025_roof.coverage" NAME="17_02_2025_roof Coverage Results" MODIFIED="1743608436291" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code" />
     <SUITE FILE_PATH="coverage/python$25_03_2025_railing.coverage" NAME="25_03_2025_railing Coverage Results" MODIFIED="1742931957460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/python$17_02_2025_door.coverage" NAME="17_02_2025_door Coverage Results" MODIFIED="1743021638286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code" />
     <SUITE FILE_PATH="coverage/python$17_02_2025_stair.coverage" NAME="17_02_2025_stair Coverage Results" MODIFIED="1742932012539" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
