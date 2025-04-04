@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "src/components/dashboard/project/tasks/KanbanContext.jsx", "src/app/dashboard/project/tasks/create/page.jsx"  ],
+, "src/components/dashboard/project/tasks/KanbanContext.jsx", "src/app/dashboard/project/tasks/create/page.jsx", "src/app/dashboard/project/materials/page.jsx", "src/components/dashboard/project/materials/Beams.jsx"  ],
   "exclude": [
     "node_modules"
   ]

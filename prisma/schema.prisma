@@ -236,7 +236,7 @@ model Column {
 
 model ColumnElement {
   id          String   @id @default(cuid())
-  columnId      String
+  columnId    String
   column      Column     @relation(fields: [columnId], references: [id])
   name        String
   globalId    String   @unique @map("GlobalId")
@@ -350,7 +350,7 @@ model Beam {
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  windows     BeamElement[]
+  beams       BeamElement[]
   
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
@@ -477,7 +477,7 @@ model Wall {
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  railings    WallElement[]
+  walls    WallElement[]
   
   // Добавляем индексы для часто используемых полей
   @@index([totalVolume])
@@ -542,7 +542,7 @@ model Roof {
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  railings    RoofElement[]
+  roofs    RoofElement[]
   
   // Добавляем индексы для часто используемых полей
   @@index([totalVolume])
@@ -558,7 +558,7 @@ model RoofElement {
   globalId    String   @unique @map("GlobalId")
   type        String
   level       String? 
-  roofs       RoofMaterial[] 
+  materials       RoofMaterial[] 
   elevation   Float?
   volume      Float?
   area        Float?
