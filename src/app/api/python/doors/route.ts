@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { execSync } from "child_process";
 import path from "path";
@@ -29,13 +29,34 @@ interface SlabElementData {
 }
 
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // 1. Configure paths
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-    
+    const { searchParams } = new URL(request.url);
+    const ifcId = searchParams.get("ifcId");
+    if (!ifcId){
+      return NextResponse.json(
+        { 
+          error: "Требуется id модели",
+        },
+        { status: 400 }
+      );
+    }
     // 2. Get absolute paths
-    const ifc = await prisma.iFC.findFirstOrThrow();
+    const ifc = await prisma.iFC.findUnique({
+      where:{
+        id: ifcId
+      }
+    });
+    if (!ifc){
+      return NextResponse.json(
+        { 
+          error: "Нужной модели не найдено",
+        },
+        { status: 400 }
+      );
+    }
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
     const baseDirModel = path.join(process.cwd(), 'public');
     const scriptPath = path.join(baseDir, 'code', '17_02_2025_door.py');
@@ -67,7 +88,6 @@ export async function GET() {
       env: env
     });
 
-    // 5. Parse and store results
     const { totalCount, totalArea, levelsData } = parsePythonOutput(output);
     await prisma.doorElement.deleteMany({ where: {} });
     await prisma.door.deleteMany({ where: {} });
@@ -77,11 +97,10 @@ export async function GET() {
         name: "Slab Analysis",
         totalCount,
         totalArea,
+        projectId: ifc.projectId,
         description: `Generated from ${path.basename(modelPath)}`,
       },
     });
-    console.log(levelsData)
-    // Create all SlabElement records with elevation
     const createPromises = levelsData.flatMap(levelData => 
       levelData.elements.map(element => 
         prisma.doorElement.create({
@@ -137,7 +156,7 @@ function parsePythonOutput(output: string): {
       const line = lines[i].trim();
   
       // Parse total count
-      if (line.startsWith("Общее количество перекрытий:")) {
+      if (line.startsWith("Общее количество дверей:")) {
         totalCount = parseInt(line.split(":")[1].trim());
         continue;
       }

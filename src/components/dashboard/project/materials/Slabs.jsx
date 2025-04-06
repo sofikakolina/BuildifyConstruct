@@ -11,7 +11,7 @@ const Slabs = ({ slabs }) => {
     <div className="bg-white mb-4 p-4 rounded-lg w-full">
       <div className="flex justify-between items-center cursor-pointer" onClick={() => setOpen(prev => !prev)}>
         <div className="flex flex-col gap-3">
-          <h3 className="font-bold text-gold text-xl">Балки ({slabs?.totalCount ? slabs.totalCount : 0})</h3>
+          <h3 className="font-bold text-gold text-xl">Перекрытия ({slabs?.totalCount ? slabs.totalCount : 0})</h3>
           <div>
             <h4 className="text-black">Количество: {slabs?.totalCount} шт</h4>
             <h4 className="text-black">Общий объем: {slabs?.totalVolume} м³</h4>
@@ -31,7 +31,7 @@ const Slabs = ({ slabs }) => {
                 <div key={slab.id} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex flex-col gap-2">
                     <div>
-                      <p className="font-medium text-black text-lg">Балка #{index+1}</p>
+                      <p className="font-medium text-black text-lg">Перекрытие #{index+1}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <p className="text-black">Название:</p>

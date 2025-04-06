@@ -31,7 +31,7 @@ const Stairs = ({ stairs }) => {
                 <div key={stair.id} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex flex-col gap-2">
                     <div>
-                      <p className="font-medium text-black text-lg">Балка #{index+1}</p>
+                      <p className="font-medium text-black text-lg">Лестница #{index+1}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <p className="text-black">Название:</p>

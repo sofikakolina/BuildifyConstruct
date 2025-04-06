@@ -3,6 +3,12 @@ import Beams from "@/components/dashboard/project/materials/Beams"
 import Columns from "@/components/dashboard/project/materials/Columns"
 import Stairs from "@/components/dashboard/project/materials/Stairs"
 import Railings from "@/components/dashboard/project/materials/Railings"
+import Slabs from "@/components/dashboard/project/materials/Slabs"
+import Doors from "@/components/dashboard/project/materials/Doors"
+import Windows from "@/components/dashboard/project/materials/Windows"
+import Walls from "@/components/dashboard/project/materials/Walls"
+import Roofs from "@/components/dashboard/project/materials/Roofs"
+
 import { useAppSelector } from "@/lib/hooks"
 import axios from "axios"
 import { useEffect, useState } from "react"
@@ -64,6 +70,11 @@ const Page = () => {
                 <Columns columns={columns}/>
                 <Stairs stairs={stairs}/>
                 <Railings railings={railings}/>
+                <Slabs slabs={slabs}/>
+                <Doors doors={doors}/>
+                <Windows windows={windows}/>
+                <Walls walls={walls}/>
+                <Roofs roofs={roofs}/>
             </div>
         </div>
     )

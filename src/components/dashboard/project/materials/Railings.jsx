@@ -14,7 +14,7 @@ const Railings = ({ railings }) => {
           <h3 className="font-bold text-gold text-xl">Перила ({railings?.totalCount ? railings.totalCount : 0})</h3>
           <div>
             <h4 className="text-black">Количество: {railings?.totalCount} шт</h4>
-            <h4 className="text-black">Общий объем: {railings?.totalVolume} м³</h4>
+            <h4 className="text-black">Общая длина: {Math.round(railings?.totalLength)} мм</h4>
             <h4 className="text-black">Описание: {railings?.description}</h4>
           </div>
         </div>
@@ -31,7 +31,7 @@ const Railings = ({ railings }) => {
                 <div key={railing.id} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex flex-col gap-2">
                     <div>
-                      <p className="font-medium text-black text-lg">Балка #{index+1}</p>
+                      <p className="font-medium text-black text-lg">Перило #{index+1}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <p className="text-black">Название:</p>
@@ -50,8 +50,8 @@ const Railings = ({ railings }) => {
                       <p className="text-black">{railing.elevation}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <p className="text-black">Объем:</p>
-                      <p className="text-black">{railing.volume} м³</p>
+                      <p className="text-black">Длина:</p>
+                      <p className="text-black">{Math.round(railing.length)} мм</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <p className="text-black">Размеры:</p>

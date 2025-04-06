@@ -4,6 +4,14 @@ import axios from 'axios'; // Импортируем AxiosError для типи�
 import { useAppSelector } from '@/lib/hooks';
 import toast from "react-hot-toast";
 import IFCViewer from "@/components/dashboard/project/ifc/IFCViewer";
+import { GrStatusGood } from "react-icons/gr";
+import { AiOutlineClockCircle } from "react-icons/ai";
+import { TbProgressDown } from "react-icons/tb"; // Загрузка
+import { TbProgressCheck } from "react-icons/tb"; // Успех
+import { TbProgressX } from "react-icons/tb"; // Неудача
+import { RiProgress6Line } from "react-icons/ri"; // Ожидание
+import { TbProgress } from "react-icons/tb"; // Ожидание
+
 
 type IFC = {
   id: string;
@@ -79,55 +87,121 @@ const Page = () => {
     setSelectedIFC(ifc); // Устанавливаем выбранный IFC-файл для просмотра
   };
 
+  
+
+
   const handleMaterialExport = async () => {
     if (!ifcFile?.path) {
       toast.error('IFC path not found');
       return;
     }
   
-    const loadingToast = toast.loading('Экспорт материалов...');
+    // Создаем объект с материалами и их статусами
+    const materials = [
+      { name: 'Крыши', endpoint: '/api/python/roofs', status: 'pending' },
+      { name: 'Стены', endpoint: '/api/python/walls', status: 'pending' },
+      { name: 'Балки', endpoint: '/api/python/beams', status: 'pending' },
+      { name: 'Ограждения', endpoint: '/api/python/railings', status: 'pending' },
+      { name: 'Колонны', endpoint: '/api/python/columns', status: 'pending' },
+      { name: 'Двери', endpoint: '/api/python/doors', status: 'pending' },
+      { name: 'Плиты', endpoint: '/api/python/slabs', status: 'pending' },
+      { name: 'Лестницы', endpoint: '/api/python/stairs', status: 'pending' },
+      { name: 'Окна', endpoint: '/api/python/windows', status: 'pending' }
+    ];
+  
+//     import { TbProgressDown } from "react-icons/tb"; // Загрузка
+// import { TbProgressCheck } from "react-icons/tb"; // Успех
+// import { TbProgressX } from "react-icons/tb"; // Неудача
+// import { RiProgress6Line } from "react-icons/ri"; // Ожидание
+// import { TbProgress } from "react-icons/tb"; // Ожидание
+
+    // Функция для обновления toast с текущими статусами
+    const updateToast = () => {
+      const message = (
+        <div>
+          <div className="font-bold mb-2">Экспорт материалов:</div>
+          {materials.map((material, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="min-w-[100px]">{material.name}</span>
+              {material.status === 'pending' && (
+                <span className="flex gap-2 text-yellow-400"><TbProgress size={20}/> Не начат</span>
+              )}
+              {material.status === 'loading' && (
+                <span className="flex gap-2 text-blue-500"><TbProgressDown size={20}/> В процессе</span>
+              )}
+              {material.status === 'success' && (
+                <span className="flex gap-2 text-green-500"><TbProgressCheck size={20}/> Успешно</span>
+              )}
+              {material.status === 'error' && (
+                <span className="flex gap-2 text-red-500"><TbProgressX size={20}/> Ошибка</span>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+  
+      toast.loading(message, { id: loadingToast });
+    };
+  
+    const loadingToast = toast.loading('Подготовка к экспорту материалов...');
   
     try {
-      const endpoints = [
-        "/api/python/roofs",
-        "/api/python/walls",
-        "/api/python/beams",
-        "/api/python/railings",
-        "/api/python/columns",
-        "/api/python/doors",
-        "/api/python/slabs",
-        "/api/python/stairs",
-        "/api/python/windows"
-      ];
-  
       // Функция для выполнения запроса с повторением при ошибках
-      const fetchWithRetry = async (endpoint: string, retries = 5) => {
+      const fetchWithRetry = async (endpoint: string, materialIndex: number, retries = 5) => {
         try {
+          // Обновляем статус на "loading"
+          materials[materialIndex].status = 'loading';
+          updateToast();
+  
           const response = await axios.get(endpoint, {
-            params: { ifcPath: ifcFile.path },
+            params: { ifcId: ifcFile.id },
             timeout: 12000000
           });
+  
+          // Обновляем статус на "success"
+          materials[materialIndex].status = 'success';
+          updateToast();
+  
           return response;
         } catch (error) {
           if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 3000)); // Ждем 3 секунды
+            await new Promise(resolve => setTimeout(resolve, 3000));
             console.log(`Повторная попытка для ${endpoint}, осталось попыток: ${retries - 1}`);
-            return fetchWithRetry(endpoint, retries - 1);
+            return fetchWithRetry(endpoint, materialIndex, retries - 1);
           }
-          throw error; // Если попытки закончились, пробрасываем ошибку дальше
+  
+          // Обновляем статус на "error"
+          materials[materialIndex].status = 'error';
+          updateToast();
+  
+          throw error;
         }
       };
   
       // Выполняем запросы последовательно
-      for (const endpoint of endpoints) {
-        await fetchWithRetry(endpoint);
-        await new Promise(resolve => setTimeout(resolve, 500)); // Небольшая задержка между разными эндпоинтами
+      for (let i = 0; i < materials.length; i++) {
+        const material = materials[i];
+        await fetchWithRetry(material.endpoint, i);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Небольшая задержка
       }
-      
-      toast.success('Материалы успешно экспортированы!', { id: loadingToast });
+  
+      // Финальное сообщение об успехе
+      toast.success(
+        <div>
+          <div className="font-bold">Все материалы успешно экспортированы!</div>
+          <div className="text-sm text-gray-600 mt-1">
+            Экспортировано {materials.filter(m => m.status === 'success').length} из {materials.length} материалов
+          </div>
+        </div>, 
+        { id: loadingToast, duration: 5000 }
+      );
     } catch (error) {
       console.error('Export failed:', error);
-      
+  
+      // Подсчитываем успешные и неуспешные экспорты
+      const successCount = materials.filter(m => m.status === 'success').length;
+      const errorCount = materials.filter(m => m.status === 'error').length;
+  
       let errorMessage = 'Ошибка при экспорте материалов';
       if (axios.isAxiosError(error)) {
         errorMessage = error.response?.data?.message || error.message;
@@ -135,7 +209,15 @@ const Page = () => {
         errorMessage = error.message;
       }
   
-      toast.error(errorMessage, { id: loadingToast });
+      toast.error(
+        <div>
+          <div className="font-bold">{errorMessage}</div>
+          <div className="text-sm text-gray-600 mt-1">
+            Успешно: {successCount}, Ошибка: {errorCount}
+          </div>
+        </div>, 
+        { id: loadingToast, duration: 5000 }
+      );
     }
   };
 

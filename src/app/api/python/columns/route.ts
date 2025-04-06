@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { execSync } from "child_process";
 import path from "path";
@@ -24,13 +24,36 @@ interface ColumnElementData {
   elevation?: number;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // 1. Configure paths
     const pythonExecutable = 'C:\\Users\\sofikakolina\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
     
     // 2. Get absolute paths
-    const ifc = await prisma.iFC.findFirstOrThrow();
+    const { searchParams } = new URL(request.url);
+    const ifcId = searchParams.get("ifcId");
+    if (!ifcId){
+      return NextResponse.json(
+        { 
+          error: "Требуется id модели",
+        },
+        { status: 400 }
+      );
+    }
+    // 2. Get absolute paths
+    const ifc = await prisma.iFC.findUnique({
+      where:{
+        id: ifcId
+      }
+    });
+    if (!ifc){
+      return NextResponse.json(
+        { 
+          error: "Нужной модели не найдено",
+        },
+        { status: 400 }
+      );
+    }
     const baseDir = path.join(process.cwd(), 'src', 'app', 'api', 'python');
     const baseDirModel = path.join(process.cwd(), 'public');
     const modelPath = path.join(baseDirModel, ifc.path);
@@ -71,6 +94,7 @@ export async function GET() {
       data: {
         name: "Column Analysis",
         totalCount,
+        projectId: ifc.projectId,
         totalVolume,
         description: `Generated from ${path.basename(modelPath)}`,
       },
