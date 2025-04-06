@@ -4,12 +4,9 @@ import axios from 'axios'; // Импортируем AxiosError для типи�
 import { useAppSelector } from '@/lib/hooks';
 import toast from "react-hot-toast";
 import IFCViewer from "@/components/dashboard/project/ifc/IFCViewer";
-import { GrStatusGood } from "react-icons/gr";
-import { AiOutlineClockCircle } from "react-icons/ai";
 import { TbProgressDown } from "react-icons/tb"; // Загрузка
 import { TbProgressCheck } from "react-icons/tb"; // Успех
 import { TbProgressX } from "react-icons/tb"; // Неудача
-import { RiProgress6Line } from "react-icons/ri"; // Ожидание
 import { TbProgress } from "react-icons/tb"; // Ожидание
 
 
