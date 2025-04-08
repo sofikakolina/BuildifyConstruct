@@ -67,7 +67,7 @@ const Stairs = ({ roofs }) => {
                       <p className="text-black">GlobalID:</p>
                       <p className="text-black truncate">{roof.globalId}</p>
                     </div>
-                    <div className="flex justify-between items-center" onClick={() => setOpenMaterials(prev => !prev)}>
+                    <div className="flex justify-between items-center cursor-pointer" onClick={() => setOpenMaterials(prev => !prev)}>
                       <div className="flex items-center gap-1">
                         <p className="text-black">Материалы:</p>
                         <p className="text-black truncate">{roof.materials.length}</p>
