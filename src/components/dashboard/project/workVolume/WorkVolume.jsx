@@ -85,10 +85,13 @@ export default function WorkVolume() {
 
   const transformRailingData = (railing) => {
     // Similar transformation for railings
+    console.log(railing)
     return [];
   };
 
   const transformRoofData = (roof) => {
+    console.log(roof)
+
     // Similar transformation for roofs
     return [];
   };
@@ -172,7 +175,7 @@ export default function WorkVolume() {
           </thead>
           <tbody>
             {Object.entries(groupedData).map(([level, items], levelIndex) => (
-            <Fragment key={`level-${level}`}>                
+            <Fragment key={`level-${levelIndex}`}>                
                 <tr 
                   key={`level-${level}`} 
                   className="bg-gray-50 cursor-pointer hover:bg-gray-100"
