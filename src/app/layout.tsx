@@ -28,7 +28,7 @@ export default function RootLayout({
       <SessionProvider>
         <Provider store={store}>
           <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white`}
           >
             {/* <Dashboard /> */}
             <div

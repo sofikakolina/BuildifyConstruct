@@ -18,7 +18,7 @@ const Railings = ({ railings }) => {
             <h4 className="text-black">Описание: {railings?.description}</h4>
           </div>
         </div>
-        <button onClick={() => setOpen(prev => !prev)} className="p-5">
+        <button className="p-5">
           {open ? <IoIosArrowUp color="#f69220" size={30} /> : <IoIosArrowDown color="#f69220" size={30} />}
         </button>
       </div>

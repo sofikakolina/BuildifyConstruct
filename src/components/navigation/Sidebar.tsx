@@ -20,7 +20,8 @@ const Sidebar = () => {
 			width: `${SidebarWidth}px`,
 			height: `calc(100vh - ${NavbarHeight}px)`,
 			top: `${NavbarHeight}px`,
-			left: 0
+			left: 0,
+			zIndex: 100,
 		}}
 		>
 		<div className='flex flex-col gap-0 w-full'>

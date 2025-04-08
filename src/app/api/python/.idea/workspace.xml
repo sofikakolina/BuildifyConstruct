@@ -6,7 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="66c257e2-0f59-4e7f-afdd-115212c892f3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/17_02_2025_roof.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/17_02_2025_roof.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Beams.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Beams.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Columns.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Columns.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Doors.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Doors.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Railings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Railings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Roofs.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Roofs.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Slabs.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Slabs.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Stairs.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Stairs.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Walls.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Walls.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Windows.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/dashboard/project/materials/Windows.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../components/navigation/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../components/navigation/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/../../../styles/globals.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,31 +42,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.16_02_2025_wall_materials.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_column (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_count_column.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_door.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_roof.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_slab (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_slab.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_stair.executor&quot;: &quot;Run&quot;,
-    &quot;Python.17_02_2025_window.executor&quot;: &quot;Run&quot;,
-    &quot;Python.22.02.2025_beam.executor&quot;: &quot;Run&quot;,
-    &quot;Python.25_03_2025_railing.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/sofikakolina/Documents/Проекты/диплом/BuildifyConstruct/src/app/api/python&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.16_02_2025_wall_materials.executor": "Run",
+    "Python.17_02_2025_column (1).executor": "Run",
+    "Python.17_02_2025_count_column.executor": "Run",
+    "Python.17_02_2025_door.executor": "Run",
+    "Python.17_02_2025_roof.executor": "Run",
+    "Python.17_02_2025_slab (1).executor": "Run",
+    "Python.17_02_2025_slab.executor": "Run",
+    "Python.17_02_2025_stair.executor": "Run",
+    "Python.17_02_2025_window.executor": "Run",
+    "Python.22.02.2025_beam.executor": "Run",
+    "Python.25_03_2025_railing.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/sofikakolina/Documents/Проекты/коммерция/roadsGosha/НС тестовая",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Python.17_02_2025_roof">
     <configuration name="16_02_2025_wall_materials" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pythonIFCReader" />
@@ -201,6 +212,7 @@
       <workItem from="1742980171525" duration="10244000" />
       <workItem from="1743509072163" duration="777000" />
       <workItem from="1743599430790" duration="1033000" />
+      <workItem from="1743973677240" duration="639000" />
     </task>
     <servers />
   </component>
