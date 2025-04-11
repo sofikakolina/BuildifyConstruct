@@ -123,6 +123,7 @@ export async function GET(request: NextRequest) {
             stepHeight: element.height,
             stepLength: element.length,
             numberOfSteps: element.numberOfSteps,
+            projectId: ifc.projectId,
           }
         })
       )

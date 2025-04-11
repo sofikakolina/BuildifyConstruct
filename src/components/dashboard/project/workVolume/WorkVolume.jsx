@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, React, Fragment } from 'react';
+import { useAppSelector } from '@/lib/hooks';
+import axios from 'axios';
+import { useState, React, Fragment, useEffect } from 'react';
 
 export default function WorkVolume() {
   const [activeTab, setActiveTab] = useState('walls');
   const [expandedLevels, setExpandedLevels] = useState({});
+  const [workVolume, setWorkVolume] = useState({});
+  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value)
 
   // Mock data - replace with your actual data fetching logic
   const mockWalls = [
@@ -115,7 +119,21 @@ export default function WorkVolume() {
       [level]: !prev[level]
     }));
   };
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try { 
+          const { data: workVolume} = axios.get(`/api/dashboard/projects/workVolume`, {
+                  params: { projectId: idCurrentProject }
+              })
+          
+          setWorkVolume(workVolume)
+          
+      } catch (error) {
+          console.error('Error fetching materials:', error);
+      }
+    }
+    fetchData()
+  }, [])
   const groupedData = getDataForCurrentTab().reduce((acc, item) => {
     const level = item.level || 'Без уровня';
     if (!acc[level]) {
@@ -131,19 +149,19 @@ export default function WorkVolume() {
       
       <div className="flex mb-4 border-b">
         <button
-          className={`px-4 py-2 ${activeTab === 'walls' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
+          className={`px-4 py-2 ${activeTab === 'walls' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
           onClick={() => setActiveTab('walls')}
         >
           Стены
         </button>
         <button
-          className={`px-4 py-2 ${activeTab === 'railings' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
+          className={`px-4 py-2 ${activeTab === 'railings' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
           onClick={() => setActiveTab('railings')}
         >
           Ограждения
         </button>
         <button
-          className={`px-4 py-2 ${activeTab === 'roofs' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
+          className={`px-4 py-2 ${activeTab === 'roofs' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
           onClick={() => setActiveTab('roofs')}
         >
           Кровля

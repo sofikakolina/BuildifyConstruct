@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
             material: element.material,
             level: element.level,
             elevation: element.elevation,
-            // lengthSource: element.lengthSource
+            projectId: ifc.projectId,
           }
         })
       )

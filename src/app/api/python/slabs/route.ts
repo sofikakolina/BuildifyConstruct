@@ -110,6 +110,7 @@ export async function GET(request: NextRequest) {
             level: element.level,
             elevation: element.elevation,
             volume: element.volume,
+            projectId: ifc.projectId,
           }
         })
       )

@@ -208,6 +208,7 @@ model SlabElement {
   material    String?
   ifcType     String?  @map("IFCType")
   properties  Json?
+  projectId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -247,6 +248,7 @@ model ColumnElement {
   area        Float?
   thickness   Float?
   material    String?
+  projectId   String?
   ifcType     String?  @map("IFCType")
   properties  Json?
   createdAt   DateTime @default(now())
@@ -292,6 +294,7 @@ model DoorElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("door_elements")
   @@index([level])
@@ -333,6 +336,7 @@ model WindowElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("window_elements")
   @@index([level])
@@ -376,6 +380,7 @@ model BeamElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("beam_elements")
   @@index([level])
@@ -418,6 +423,7 @@ model StairElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("stair_elements")
   @@index([level])
@@ -458,6 +464,7 @@ model RailingElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("railing_elements")
   @@index([level])
@@ -503,6 +510,7 @@ model WallElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("wall_elements")
   @@index([level])
@@ -523,6 +531,7 @@ model WallMaterial {
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+  projectId   String?
 
   @@map("wall_materials")
   @@index([name])
@@ -568,6 +577,7 @@ model RoofElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  projectId   String?
   
   @@map("roof_elements")
   @@index([level])
@@ -588,6 +598,7 @@ model RoofMaterial {
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+  projectId   String?
 
   @@map("roof_materials")
   @@index([name])

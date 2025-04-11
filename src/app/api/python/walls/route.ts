@@ -133,6 +133,7 @@ export async function GET(request: NextRequest) {
               width: element.width,
               height: element.height,
               length: element.length,
+              projectId: ifc.projectId,
             }
           });
 
@@ -148,6 +149,7 @@ export async function GET(request: NextRequest) {
                   volume: material.volume,
                   area: material.area,
                   elevation: element.elevation,
+                  projectId: ifc.projectId,
                 }
               })
             );

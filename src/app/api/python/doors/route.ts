@@ -114,6 +114,7 @@ export async function GET(request: NextRequest) {
             area: element.area,
             width: element.width,
             height: element.height,
+            projectId: ifc.projectId,
           }
         })
       )

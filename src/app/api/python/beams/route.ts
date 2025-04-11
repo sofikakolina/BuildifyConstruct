@@ -126,6 +126,7 @@ export async function GET(request:NextRequest) {
             height: element.height,
             length: element.length,
             material: element.material,
+            projectId: ifc.projectId,
           }
         })
       )
