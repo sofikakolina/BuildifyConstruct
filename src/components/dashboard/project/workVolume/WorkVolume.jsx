@@ -5,111 +5,90 @@ import axios from 'axios';
 import { useState, React, Fragment, useEffect } from 'react';
 
 export default function WorkVolume() {
-  const [activeTab, setActiveTab] = useState('walls');
   const [expandedLevels, setExpandedLevels] = useState({});
-  const [workVolume, setWorkVolume] = useState({});
-  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value)
+  const [workVolume, setWorkVolume] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
 
-  // Mock data - replace with your actual data fetching logic
-  const mockWalls = [
-    {
-      id: 'wall-1',
-      name: 'Наружные стены',
-      totalCount: 10,
-      totalVolume: 45.2,
-      totalArea: 120.5,
-      description: 'Основные несущие стены',
-      projectId: 'project-1',
-      walls: [
-        {
-          id: 'wall-el-1',
-          wallId: 'wall-1',
-          name: 'Стена 1',
-          globalId: 'WALL-001',
-          type: 'Несущая',
-          level: '1 этаж',
-          elevation: 0,
-          volume: 12.5,
-          area: 35.2,
-          height: 3.2,
-          length: 11,
-          width: 0.4,
-          materials: [
-            {
-              id: 'mat-1',
-              wallElementId: 'wall-el-1',
-              name: 'Кирпич керамический',
-              type: 'Кладка',
-              thickness: 400,
-              volume: 12.5,
-              area: 35.2,
-              elevation: 0
-            }
-          ]
-        },
-        // More wall elements...
-      ]
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try { 
+        const response = await axios.get(`/api/dashboard/projects/workVolume`, {
+          params: { projectId: idCurrentProject }
+        });
+        setWorkVolume(response.data);
+      } catch (error) {
+        console.error('Error fetching work volume:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  ];
+    
+    if (idCurrentProject) {
+      fetchData();
+    }
+  }, [idCurrentProject]);
 
-  const mockRailings = [
-    // Similar structure for railings
-  ];
-
-  const mockRoofs = [
-    // Similar structure for roofs
-  ];
-
-  const transformWallData = (wall) => {
-    return wall.walls.map(wallEl => ({
-      id: wallEl.id,
-      name: wallEl.name,
-      unit: 'м3',
-      quantity: wallEl.volume || 0,
-      justification: 'ГЭСН 07-01-001-06',
-      laborCost: 213.12,
-      totalLaborCost: (wallEl.volume || 0) * 213.12,
-      machine: 'Кран гусеничный до 16 т',
-      machineTime: 52.49,
-      totalMachineTime: (wallEl.volume || 0) * 52.49,
-      workers: 2,
-      machines: 1,
-      shifts: 1,
-      mechDuration: Math.ceil(((wallEl.volume || 0) * 52.49) / (1 * 8 * 1)),
-      nonMechDuration: Math.ceil(((wallEl.volume || 0) * 213.12) / (8 * 1 * 2)),
-      totalDuration: Math.max(
-        Math.ceil(((wallEl.volume || 0) * 52.49) / (1 * 8 * 1),
-        Math.ceil(((wallEl.volume || 0) * 213.12) / (8 * 1 * 2))
-      )),
-      crew: 'Рабочие-строители 3, 4 разряда; машинисты',
-      volumeCalc: `Площадь: ${wallEl.area?.toFixed(2)} м2`,
-      level: wallEl.level
-    }));
-  };
-
-  const transformRailingData = (railing) => {
-    // Similar transformation for railings
-    console.log(railing)
-    return [];
-  };
-
-  const transformRoofData = (roof) => {
-    console.log(roof)
-
-    // Similar transformation for roofs
-    return [];
-  };
-
-  const getDataForCurrentTab = () => {
-    switch (activeTab) {
-      case 'railings':
-        return mockRailings.flatMap(transformRailingData);
-      case 'walls':
-        return mockWalls.flatMap(transformWallData);
-      case 'roofs':
-        return mockRoofs.flatMap(transformRoofData);
-      default:
-        return [];
+  const calculateTypeTotals = (elements, type) => {
+    if (type === 'slabs' || type === 'beams') {
+      const volume = elements.reduce((sum, el) => sum + (el.volume || 0), 0);
+      const laborCost = 213.12;
+      const totalLaborCost = volume * laborCost;
+      const machineTime = 52.49;
+      const totalMachineTime = volume * machineTime;
+      
+      return {
+        type: type === 'slabs' ? 'Перекрытия' : 'Балки',
+        volume: volume.toFixed(2),
+        unit: 'м3',
+        justification: 'ГЭСН',
+        laborCost: laborCost.toFixed(2),
+        totalLaborCost: totalLaborCost.toFixed(2),
+        machine: 'Кран',
+        machineTime: machineTime.toFixed(2),
+        totalMachineTime: totalMachineTime.toFixed(2),
+        workers: 2,
+        machines: 1,
+        shifts: 1,
+        mechDuration: Math.ceil(totalMachineTime / (1 * 8 * 1)),
+        nonMechDuration: Math.ceil(totalLaborCost / (8 * 1 * 2)),
+        totalDuration: Math.max(
+          Math.ceil(totalMachineTime / (1 * 8 * 1)),
+          Math.ceil(totalLaborCost / (8 * 1 * 2))
+        ),
+        crew: 'Рабочие 3 разряда',
+        volumeCalc: `Объем: ${volume.toFixed(2)} м3`
+      };
+    } else { // stairs
+      const count = elements.length;
+      const laborCost = 150;
+      const totalLaborCost = count * laborCost;
+      const machineTime = 30;
+      const totalMachineTime = count * machineTime;
+      
+      return {
+        type: 'Лестницы',
+        volume: count,
+        unit: 'шт',
+        justification: 'ГЭСН',
+        laborCost: laborCost.toFixed(2),
+        totalLaborCost: totalLaborCost.toFixed(2),
+        machine: 'Бетономешалка',
+        machineTime: machineTime.toFixed(2),
+        totalMachineTime: totalMachineTime.toFixed(2),
+        workers: 3,
+        machines: 1,
+        shifts: 1,
+        mechDuration: Math.ceil(totalMachineTime / (1 * 8 * 1)),
+        nonMechDuration: Math.ceil(totalLaborCost / (8 * 1 * 3)),
+        totalDuration: Math.max(
+          Math.ceil(totalMachineTime / (1 * 8 * 1)),
+          Math.ceil(totalLaborCost / (8 * 1 * 3))
+        ),
+        crew: 'Рабочие 4 разряда',
+        volumeCalc: `Количество: ${count} шт`
+      };
     }
   };
 
@@ -119,139 +98,176 @@ export default function WorkVolume() {
       [level]: !prev[level]
     }));
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      try { 
-          const { data: workVolume} = axios.get(`/api/dashboard/projects/workVolume`, {
-                  params: { projectId: idCurrentProject }
-              })
-          
-          setWorkVolume(workVolume)
-          
-      } catch (error) {
-          console.error('Error fetching materials:', error);
-      }
-    }
-    fetchData()
-  }, [])
-  const groupedData = getDataForCurrentTab().reduce((acc, item) => {
-    const level = item.level || 'Без уровня';
-    if (!acc[level]) {
-      acc[level] = [];
-    }
-    acc[level].push(item);
-    return acc;
-  }, {});
 
   return (
-    <div className="p-4">
-      <h1 className="mb-4 font-bold text-gold text-2xl">Ведомость объема работ</h1>
-      
-      <div className="flex mb-4 border-b">
-        <button
-          className={`px-4 py-2 ${activeTab === 'walls' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
-          onClick={() => setActiveTab('walls')}
-        >
-          Стены
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === 'railings' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
-          onClick={() => setActiveTab('railings')}
-        >
-          Ограждения
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === 'roofs' ? 'border-b-2 border-blue-500 font-bold text-black' : 'text-gray-400'}`}
-          onClick={() => setActiveTab('roofs')}
-        >
-          Кровля
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">№</th>
-              <th className="border p-2">Наименование работ</th>
-              <th className="border p-2">Объём работ</th>
-              <th className="border p-2">Обоснование(ГЭСН)</th>
-              <th className="border p-2">Затраты труда</th>
-              <th className="border p-2">Q всего чел. ч.</th>
-              <th className="border p-2">Машина</th>
-              <th className="border p-2">норм маш.ч.</th>
-              <th className="border p-2">Q всего маш.ч.</th>
-              <th className="border p-2">Число рабочих</th>
-              <th className="border p-2">Число машин</th>
-              <th className="border p-2">Число смен</th>
-              <th className="border p-2">Продолжит. Механ. Работ дн</th>
-              <th className="border p-2">Продолжит. Немехан. Работ дн</th>
-              <th className="border p-2">Продолжит. Раб, дн.</th>
-              <th className="border p-2">Состав бригады чел.</th>
-              <th className="border p-2">Расчёт объёма</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(groupedData).map(([level, items], levelIndex) => (
-            <Fragment key={`level-${levelIndex}`}>                
-                <tr 
-                  key={`level-${level}`} 
-                  className="bg-gray-50 cursor-pointer hover:bg-gray-100"
-                  onClick={() => toggleLevel(level)}
-                >
-                  <td colSpan={17} className="border p-2 font-semibold">
-                    <div className="flex items-center">
-                      {expandedLevels[level] ? '▼' : '►'} {level}
-                    </div>
-                  </td>
-                </tr>
-                {expandedLevels[level] && items.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{item.name}</td>
-                    <td className="border p-2">
-                      <div>{item.quantity.toFixed(2)} {item.unit}</div>
+    <div className="">
+      {isLoading ? (
+        <div>Загрузка данных...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-2">Этаж</th>
+                <th className="border p-2">Тип</th>
+                <th className="border p-2">Объём работ</th>
+                <th className="border p-2">Обоснование(ГЭСН)</th>
+                <th className="border p-2">Затраты труда</th>
+                <th className="border p-2">Q всего чел. ч.</th>
+                <th className="border p-2">Машина</th>
+                <th className="border p-2">норм маш.ч.</th>
+                <th className="border p-2">Q всего маш.ч.</th>
+                <th className="border p-2">Число рабочих</th>
+                <th className="border p-2">Число машин</th>
+                <th className="border p-2">Число смен</th>
+                <th className="border p-2">Продолжит. Механ. Работ дн</th>
+                <th className="border p-2">Продолжит. Немехан. Работ дн</th>
+                <th className="border p-2">Продолжит. Раб, дн.</th>
+                <th className="border p-2">Состав бригады чел.</th>
+                <th className="border p-2">Расчёт объёма</th>
+              </tr>
+            </thead>
+            <tbody>
+              {workVolume.map((floorData, floorIndex) => (
+                <Fragment key={`floor-${floorIndex}`}>
+                  <tr 
+                    className="bg-blue-50 cursor-pointer hover:bg-blue-100"
+                    onClick={() => toggleLevel(floorData.level)}
+                  >
+                    <td colSpan={17} className="border p-2 font-semibold">
+                      <div className="flex items-center">
+                        {expandedLevels[floorData.level] ? '▼' : '►'} {floorData.level}
+                        <div className="ml-4 text-sm text-gray-600">
+                          (Перекрытий: {floorData.counts.slabs}, Балок: {floorData.counts.beams}, Лестниц: {floorData.counts.stairs})
+                        </div>
+                      </div>
                     </td>
-                    <td className="border p-2">{item.justification}</td>
-                    <td className="border p-2">{item.laborCost.toFixed(2)}</td>
-                    <td className="border p-2">{item.totalLaborCost.toFixed(2)}</td>
-                    <td className="border p-2">{item.machine}</td>
-                    <td className="border p-2">{item.machineTime.toFixed(2)}</td>
-                    <td className="border p-2">{item.totalMachineTime.toFixed(2)}</td>
-                    <td className="border p-2">{item.workers}</td>
-                    <td className="border p-2">{item.machines}</td>
-                    <td className="border p-2">{item.shifts}</td>
-                    <td className="border p-2">{item.mechDuration.toFixed(1)}</td>
-                    <td className="border p-2">{item.nonMechDuration.toFixed(1)}</td>
-                    <td className="border p-2">{item.totalDuration.toFixed(1)}</td>
-                    <td className="border p-2">{item.crew}</td>
-                    <td className="border p-2">{item.volumeCalc}</td>
                   </tr>
-                ))}
+                  
+                  {expandedLevels[floorData.level] && (
+                    <>
+                      {/* Строка для плит */}
+                      {floorData.counts.slabs > 0 && (
+                        (() => {
+                          const totals = calculateTypeTotals(floorData.elements.slabs, 'slabs');
+                          return (
+                            <tr className="hover:bg-gray-50">
+                              <td className="border p-2">{floorData.level}</td>
+                              <td className="border p-2">{totals.type}</td>
+                              <td className="border p-2">{totals.volume} {totals.unit}</td>
+                              <td className="border p-2">{totals.justification}</td>
+                              <td className="border p-2">{totals.laborCost}</td>
+                              <td className="border p-2">{totals.totalLaborCost}</td>
+                              <td className="border p-2">{totals.machine}</td>
+                              <td className="border p-2">{totals.machineTime}</td>
+                              <td className="border p-2">{totals.totalMachineTime}</td>
+                              <td className="border p-2">{totals.workers}</td>
+                              <td className="border p-2">{totals.machines}</td>
+                              <td className="border p-2">{totals.shifts}</td>
+                              <td className="border p-2">{totals.mechDuration}</td>
+                              <td className="border p-2">{totals.nonMechDuration}</td>
+                              <td className="border p-2">{totals.totalDuration}</td>
+                              <td className="border p-2">{totals.crew}</td>
+                              <td className="border p-2">{totals.volumeCalc}</td>
+                            </tr>
+                          );
+                        })()
+                      )}
+                      
+                      {/* Строка для балок */}
+                      {floorData.counts.beams > 0 && (
+                        (() => {
+                          const totals = calculateTypeTotals(floorData.elements.beams, 'beams');
+                          return (
+                            <tr className="hover:bg-gray-50">
+                              <td className="border p-2">{floorData.level}</td>
+                              <td className="border p-2">{totals.type}</td>
+                              <td className="border p-2">{totals.volume} {totals.unit}</td>
+                              <td className="border p-2">{totals.justification}</td>
+                              <td className="border p-2">{totals.laborCost}</td>
+                              <td className="border p-2">{totals.totalLaborCost}</td>
+                              <td className="border p-2">{totals.machine}</td>
+                              <td className="border p-2">{totals.machineTime}</td>
+                              <td className="border p-2">{totals.totalMachineTime}</td>
+                              <td className="border p-2">{totals.workers}</td>
+                              <td className="border p-2">{totals.machines}</td>
+                              <td className="border p-2">{totals.shifts}</td>
+                              <td className="border p-2">{totals.mechDuration}</td>
+                              <td className="border p-2">{totals.nonMechDuration}</td>
+                              <td className="border p-2">{totals.totalDuration}</td>
+                              <td className="border p-2">{totals.crew}</td>
+                              <td className="border p-2">{totals.volumeCalc}</td>
+                            </tr>
+                          );
+                        })()
+                      )}
+                      
+                      {/* Строка для лестниц */}
+                      {floorData.counts.stairs > 0 && (
+                        (() => {
+                          const totals = calculateTypeTotals(floorData.elements.stairs, 'stairs');
+                          return (
+                            <tr className="hover:bg-gray-50">
+                              <td className="border p-2">{floorData.level}</td>
+                              <td className="border p-2">{totals.type}</td>
+                              <td className="border p-2">{totals.volume} {totals.unit}</td>
+                              <td className="border p-2">{totals.justification}</td>
+                              <td className="border p-2">{totals.laborCost}</td>
+                              <td className="border p-2">{totals.totalLaborCost}</td>
+                              <td className="border p-2">{totals.machine}</td>
+                              <td className="border p-2">{totals.machineTime}</td>
+                              <td className="border p-2">{totals.totalMachineTime}</td>
+                              <td className="border p-2">{totals.workers}</td>
+                              <td className="border p-2">{totals.machines}</td>
+                              <td className="border p-2">{totals.shifts}</td>
+                              <td className="border p-2">{totals.mechDuration}</td>
+                              <td className="border p-2">{totals.nonMechDuration}</td>
+                              <td className="border p-2">{totals.totalDuration}</td>
+                              <td className="border p-2">{totals.crew}</td>
+                              <td className="border p-2">{totals.volumeCalc}</td>
+                            </tr>
+                          );
+                        })()
+                      )}
+                    </>
+                  )}
                 </Fragment>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="bg-gray-100 font-semibold">
-              <td colSpan={5} className="border p-2">Итого:</td>
-              <td className="border p-2">
-                {Object.values(groupedData)
-                  .flat()
-                  .reduce((sum, item) => sum + item.totalLaborCost, 0)
-                  .toFixed(2)}
-              </td>
-              <td colSpan={3} className="border p-2"></td>
-              <td className="border p-2">
-                {Object.values(groupedData)
-                  .flat()
-                  .reduce((sum, item) => sum + item.totalMachineTime, 0)
-                  .toFixed(2)}
-              </td>
-              <td colSpan={8} className="border p-2"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-100 font-semibold">
+                <td colSpan={2} className="border p-2">Итого по проекту:</td>
+                <td className="border p-2">
+                  {workVolume.reduce((sum, floor) => 
+                    sum + floor.elements.slabs.reduce((s, slab) => s + (slab.volume || 0), 0) +
+                    floor.elements.beams.reduce((s, beam) => s + (beam.volume || 0), 0)
+                  , 0).toFixed(2)} м3 + {' '}
+                  {workVolume.reduce((sum, floor) => sum + floor.elements.stairs.length, 0)} шт
+                </td>
+                <td className="border p-2"></td>
+                <td className="border p-2"></td>
+                <td className="border p-2">
+                  {workVolume.reduce((sum, floor) => 
+                    sum + floor.elements.slabs.reduce((s, slab) => s + ((slab.volume || 0) * 213.12), 0) +
+                    floor.elements.beams.reduce((s, beam) => s + ((beam.volume || 0) * 213.12), 0) +
+                    floor.elements.stairs.length * 150
+                  , 0).toFixed(2)}
+                </td>
+                <td className="border p-2"></td>
+                <td className="border p-2"></td>
+                <td className="border p-2">
+                  {workVolume.reduce((sum, floor) => 
+                    sum + floor.elements.slabs.reduce((s, slab) => s + ((slab.volume || 0) * 52.49), 0) +
+                    floor.elements.beams.reduce((s, beam) => s + ((beam.volume || 0) * 52.49), 0) +
+                    floor.elements.stairs.length * 30
+                  , 0).toFixed(2)}
+                </td>
+                <td colSpan={8} className="border p-2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
