@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
       maxBuffer: 1024 * 1024 * 10, // 10MB buffer
       env: env
     });
-
+    console.log(output)
     // 5. Parse and store results
     const { totalCount, totalLength, levelsData } = parsePythonOutput(output);
     await prisma.railingElement.deleteMany({ where: {} });

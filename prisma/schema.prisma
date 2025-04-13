@@ -147,7 +147,7 @@ model IFC {
 model Task {
   id               String               @id @default(cuid())
   userId           String?
-  projectId String?
+  projectId        String?
   status           TaskStatus       @default(Todo)
   priority         OrderPriority     @default(Normal)
   name             String
@@ -211,7 +211,9 @@ model SlabElement {
   projectId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+
   @@map("slab_elements")
   @@index([level])
   @@index([elevation])
@@ -253,7 +255,9 @@ model ColumnElement {
   properties  Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+
   @@map("column_elements")
   @@index([level])
   @@index([elevation])
@@ -295,6 +299,8 @@ model DoorElement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   projectId   String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
   
   @@map("door_elements")
   @@index([level])
@@ -337,7 +343,9 @@ model WindowElement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   projectId   String?
-  
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+
   @@map("window_elements")
   @@index([level])
   @@index([elevation])
@@ -381,6 +389,8 @@ model BeamElement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   projectId   String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
   
   @@map("beam_elements")
   @@index([level])
@@ -424,6 +434,8 @@ model StairElement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   projectId   String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
   
   @@map("stair_elements")
   @@index([level])
@@ -465,6 +477,8 @@ model RailingElement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   projectId   String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
   
   @@map("railing_elements")
   @@index([level])
@@ -531,7 +545,9 @@ model WallMaterial {
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  projectId   String?
+  projectId       String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
 
   @@map("wall_materials")
   @@index([name])
@@ -567,7 +583,7 @@ model RoofElement {
   globalId    String   @unique @map("GlobalId")
   type        String
   level       String? 
-  materials       RoofMaterial[] 
+  materials   RoofMaterial[] 
   elevation   Float?
   volume      Float?
   area        Float?
@@ -598,11 +614,43 @@ model RoofMaterial {
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  projectId   String?
-
+  projectId       String?
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  
   @@map("roof_materials")
   @@index([name])
   @@index([type])
   @@index([elevation])
   @@index([roofElementId])
+}
+
+model Gasn {
+  id              String      @id @default(cuid())
+  name            String
+  justification   String
+  unit            String
+  laborCostTime   Float       @default(0)
+  machine         String
+  machineTime     Float       @default(0)
+  workers         Int         @default(0)
+  crew            String
+  numberOfWorkers Int         @default(0)
+  numberOfMashine Int         @default(0)
+  numberOfChanges Int         @default(0)
+  teamConsists    String? 
+
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  projectId       String?
+  roofMaterials   RoofMaterial[]
+  wallMaterials   WallMaterial[]
+  columnElements  ColumnElement[]
+  slabElements    SlabElement[]
+  beamElements    BeamElement[]
+  doorElements    DoorElement[]
+  windowElements  WindowElement[]
+  stairElements   StairElement[]
+  railingElements RailingElement[]
 }
