@@ -628,22 +628,30 @@ model RoofMaterial {
 model Gasn {
   id              String      @id @default(cuid())
   name            String
-  justification   String
+  countOfUnit     Float       @default(0)
   unit            String
-  laborCostTime   Float       @default(0)
+  workVolume      Float       @default(0)
+  justification   String
+  normalHoursPeaple Float       @default(0)
   machine         String
-  machineTime     Float       @default(0)
-  workers         Int         @default(0)
-  crew            String
+  normalHoursMashine Float       @default(0)
   numberOfWorkers Int         @default(0)
   numberOfMashine Int         @default(0)
   numberOfChanges Int         @default(0)
-  teamConsists    String? 
+  crew            String //состав бригады
+  volumeCalculation String? //как происходит расчет работы
+  
+  // laborCostTime   Float       @default(0)
+  // machineTime     Float       @default(0)
+  // workerscostTime Float       @default(0)
+  
+  // teamConsists    String? 
 
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   projectId       String?
+  workVolumes     WorkVolume[]
   roofMaterials   RoofMaterial[]
   wallMaterials   WallMaterial[]
   columnElements  ColumnElement[]
@@ -653,4 +661,43 @@ model Gasn {
   windowElements  WindowElement[]
   stairElements   StairElement[]
   railingElements RailingElement[]
+}
+
+model WorkVolume{
+  id              String      @id @default(cuid())
+  name            String
+  countOfUnit     Float       @default(0)
+  unit            String
+  workVolume      Float       @default(0)
+  justification   String
+  normalHoursPeaple Float       @default(0)
+  machine         String
+  normalHoursMashine Float       @default(0)
+  numberOfWorkers Int         @default(0)
+  numberOfMashine Int         @default(0)
+  numberOfChanges Int         @default(0)
+  crew            String //состав бригады
+  volumeCalculation String? //как происходит расчет работы
+  
+  gasnId          String?
+  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  // laborCostTime   Float       @default(0)
+  // machineTime     Float       @default(0)
+  // workerscostTime Float       @default(0)
+  
+  // teamConsists    String? 
+
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  projectId       String?
+  // roofMaterials   RoofMaterial[]
+  // wallMaterials   WallMaterial[]
+  // columnElements  ColumnElement[]
+  // slabElements    SlabElement[]
+  // beamElements    BeamElement[]
+  // doorElements    DoorElement[]
+  // windowElements  WindowElement[]
+  // stairElements   StairElement[]
+  // railingElements RailingElement[]
 }
