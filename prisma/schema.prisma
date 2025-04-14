@@ -635,9 +635,6 @@ model Gasn {
   normalHoursPeaple Float       @default(0)
   machine         String
   normalHoursMashine Float       @default(0)
-  numberOfWorkers Int         @default(0)
-  numberOfMashine Int         @default(0)
-  numberOfChanges Int         @default(0)
   crew            String //состав бригады
   volumeCalculation String? //как происходит расчет работы
   
@@ -666,18 +663,10 @@ model Gasn {
 model WorkVolume{
   id              String      @id @default(cuid())
   name            String
-  countOfUnit     Float       @default(0)
-  unit            String
-  workVolume      Float       @default(0)
-  justification   String
-  normalHoursPeaple Float       @default(0)
-  machine         String
-  normalHoursMashine Float       @default(0)
+  volumeWork      Float
   numberOfWorkers Int         @default(0)
   numberOfMashine Int         @default(0)
   numberOfChanges Int         @default(0)
-  crew            String //состав бригады
-  volumeCalculation String? //как происходит расчет работы
   
   gasnId          String?
   gasn            Gasn? @relation(fields: [gasnId], references: [id])

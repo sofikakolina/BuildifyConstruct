@@ -4,8 +4,8 @@ import axios from 'axios';
 import { useAppSelector } from '@/lib/hooks';
 import toast from "react-hot-toast";
 import { TextField, Button } from "@mui/material";
-import { MdDelete, MdDownload, MdAdd } from 'react-icons/md';
-import { downloadFile } from "@/lib/download";
+import { MdDelete, MdAdd } from 'react-icons/md';
+// import { downloadFile } from "@/lib/download";
 
 interface GasnItem {
   id: string;
@@ -17,9 +17,6 @@ interface GasnItem {
   normalHoursPeaple: number;
   machine: string;
   normalHoursMashine: number;
-  numberOfWorkers: number;
-  numberOfMashine: number;
-  numberOfChanges: number;
   crew: string;
   volumeCalculation?: string;
 }
@@ -35,9 +32,6 @@ const Gasn = () => {
     normalHoursPeaple: 0,
     machine: '',
     normalHoursMashine: 0,
-    numberOfWorkers: 0,
-    numberOfMashine: 0,
-    numberOfChanges: 0,
     crew: '',
     volumeCalculation: ''
   });
@@ -76,9 +70,6 @@ const Gasn = () => {
         normalHoursPeaple: 0,
         machine: '',
         normalHoursMashine: 0,
-        numberOfWorkers: 0,
-        numberOfMashine: 0,
-        numberOfChanges: 0,
         crew: '',
         volumeCalculation: ''
       });
@@ -187,30 +178,6 @@ const Gasn = () => {
               name="normalHoursMashine"
               type="number"
               value={newGasn.normalHoursMashine}
-              onChange={handleInputChange}
-              fullWidth
-            />
-            <TextField
-              label="Количество рабочих"
-              name="numberOfWorkers"
-              type="number"
-              value={newGasn.numberOfWorkers}
-              onChange={handleInputChange}
-              fullWidth
-            />
-            <TextField
-              label="Количество машин"
-              name="numberOfMashine"
-              type="number"
-              value={newGasn.numberOfMashine}
-              onChange={handleInputChange}
-              fullWidth
-            />
-            <TextField
-              label="Количество смен"
-              name="numberOfChanges"
-              type="number"
-              value={newGasn.numberOfChanges}
               onChange={handleInputChange}
               fullWidth
             />
