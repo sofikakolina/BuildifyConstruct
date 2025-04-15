@@ -325,7 +325,7 @@ export default function WorkVolume() {
         <td className="border p-2">{item.gasn?.unit ? `${quantity.toFixed(2)}` : ''}</td>
         {renderGasnCell(item, level)}
         <td className="border p-2">{item.gasn?.normalHoursPeople || ''}</td>
-        <td className="border p-2">{peopleQ}</td>
+        <td className="border p-2">{typeof(peopleQ)==Number ? peopleQ.toFixed(2) : ''}</td>
         <td className="border p-2">{item.gasn?.machine || ''}</td>
         <td className="border p-2">{item.gasn?.normalHoursMashine || ''}</td>
         <td className="border p-2">{totalMachineTime ? totalMachineTime.toFixed(2) : ''}</td>
