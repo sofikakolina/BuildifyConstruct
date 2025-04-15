@@ -12,7 +12,6 @@ interface GasnItem {
   name: string;
   countOfUnit: number;
   unit: string;
-  workVolume: number;
   justification: string;
   normalHoursPeaple: number;
   machine: string;
@@ -27,7 +26,6 @@ const Gasn = () => {
     name: '',
     countOfUnit: 0,
     unit: '',
-    workVolume: 0,
     justification: '',
     normalHoursPeaple: 0,
     machine: '',
@@ -65,7 +63,6 @@ const Gasn = () => {
         name: '',
         countOfUnit: 0,
         unit: '',
-        workVolume: 0,
         justification: '',
         normalHoursPeaple: 0,
         machine: '',
@@ -96,7 +93,7 @@ const Gasn = () => {
     const { name, value } = e.target;
     setNewGasn(prev => ({
       ...prev,
-      [name]: name.includes('countOfUnit') || name.includes('workVolume') || 
+      [name]: name.includes('countOfUnit') || 
               name.includes('normalHours') || name.includes('numberOf') ? 
               Number(value) : value
     }));
@@ -108,8 +105,7 @@ const Gasn = () => {
       
       <div className="mb-6">
         <button 
-		  className="bg-gold text-white flex items-center px-5 py-2 rounded-lg"
-        //   startIcon={}
+          className="bg-gold text-white flex items-center px-5 py-2 rounded-lg"
           onClick={() => setIsCreating(true)}
         >
           <MdAdd />Добавить ГЭСН
@@ -140,14 +136,6 @@ const Gasn = () => {
               name="countOfUnit"
               type="number"
               value={newGasn.countOfUnit}
-              onChange={handleInputChange}
-              fullWidth
-            />
-            <TextField
-              label="Объем работ"
-              name="workVolume"
-              type="number"
-              value={newGasn.workVolume}
               onChange={handleInputChange}
               fullWidth
             />
@@ -232,7 +220,6 @@ const Gasn = () => {
                 <td className="px-6 py-4 whitespace-nowrap">{gasn.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{gasn.countOfUnit} {gasn.unit}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{gasn.justification}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{gasn.workVolume}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button 
                     onClick={() => handleDeleteGasn(gasn.id)} 

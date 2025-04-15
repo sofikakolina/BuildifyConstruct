@@ -146,6 +146,7 @@ export async function GET(request: NextRequest) {
                   thickness: material.thickness,
                   volume: material.volume,
                   area: material.area,
+                  level: element.level,
                   elevation: element.elevation,
                   projectId: ifc.projectId,
                 }

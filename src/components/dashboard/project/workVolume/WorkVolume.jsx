@@ -1,314 +1,403 @@
-// React Component (WorkVolume.tsx)
 'use client'
 
-import { useAppSelector } from '@/lib/hooks';
-import axios from 'axios';
-import { useState, React, Fragment, useEffect } from 'react';
+import { useAppSelector } from '@/lib/hooks'
+import { useState, useEffect, Fragment, useRef } from 'react'
+import axios from 'axios'
 
 export default function WorkVolume() {
-  const [expandedLevels, setExpandedLevels] = useState({});
-  const [workVolume, setWorkVolume] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
+  const [expandedLevels, setExpandedLevels] = useState({})
+  const [workVolume, setWorkVolume] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [gasnList, setGasnList] = useState([])
+  const [selectedCell, setSelectedCell] = useState(null)
+  const [editingCell, setEditingCell] = useState(null) // { level, name, field, value }
+  const tableRef = useRef(null)
+  const inputRef = useRef(null)
+  const idCurrentProject = useAppSelector(state => state.idCurrentProject.value)
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      try { 
-        const response = await axios.get(`/api/dashboard/projects/workVolume`, {
-          params: { projectId: idCurrentProject }
-        });
-        setWorkVolume(response.data);
-      } catch (error) {
-        console.error('Error fetching work volume:', error);
+      if (!idCurrentProject) return
+      setIsLoading(true)
+      try {
+        const [res, gasnRes] = await Promise.all([
+          axios.get('/api/dashboard/projects/workVolume', {
+            params: { projectId: idCurrentProject }
+          }),
+          axios.get('/api/dashboard/projects/gasn')
+        ])
+
+        setGasnList(gasnRes.data.gasn)
+
+        const grouped = {}
+        res.data.forEach(item => {
+          const level = item.level || 'Не указан'
+          if (!grouped[level]) grouped[level] = []
+          grouped[level].push(item)
+        })
+
+        setWorkVolume(grouped)
+      } catch (err) {
+        console.error('Ошибка при загрузке данных объема работ:', err)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
-    
-    if (idCurrentProject) {
-      fetchData();
+
+    fetchData()
+  }, [idCurrentProject])
+
+  useEffect(() => {
+    if (editingCell && inputRef.current) {
+      inputRef.current.focus()
     }
-  }, [idCurrentProject]);
+  }, [editingCell])
 
-  const calculateTypeTotals = (elements, type) => {
-    // Параметры для разных типов элементов
-    const typeConfig = {
-      slabs: {
-        name: 'Перекрытия',
-        justification: "ГЭСН 07-01-006-06",
-        unit: 'м3',
-        laborCost: 213.12,
-        machine: 'Кран',
-        machineTime: 52.49,
-        workers: 2,
-        crew: 'Рабочие 3 разряда'
-      },
-      beams: {
-        name: 'Балки',
-        justification:"ГЭСН 06-07-001-02",
-        unit: 'м3',
-        laborCost: 213.12,
-        machine: 'Кран',
-        machineTime: 52.49,
-        workers: 2,
-        crew: 'Рабочие 3 разряда'
-      },
-      columns: {
-        name: 'Колонны',
-        justification:"ГЭСН 07-01-001-06",
-        unit: 'шт',
-        laborCost: 230.50,
-        machine: 'Кран',
-        machineTime: 45.30,
-        workers: 2,
-        crew: 'Рабочие 3 разряда'
-      },
-      stairs: {
-        name: 'Лестницы',
-        justification:"ГЭСН 29-01-216-01",
-        unit: 'м3',
-        laborCost: 150,
-        machine: 'Бетономешалка',
-        machineTime: 30,
-        workers: 3,
-        crew: 'Рабочие 4 разряда'
-      },
-      railings: {
-        name: 'Ограждения',
-        justification:"ГЭСН 07-05-016-03",
-        unit: 'м.п.',
-        laborCost: 85.75,
-        machine: 'Сварочный аппарат',
-        machineTime: 15.20,
-        workers: 2,
-        crew: 'Сварщики'
-      },
-      doors: {
-        name: 'Двери',
-        justification:"ГЭСН 09-04-012-01",
-        unit: 'м3',
-        laborCost: 120,
-        machine: 'Электроинструмент',
-        machineTime: 8.50,
-        workers: 2,
-        crew: 'Плотники'
-      },
-      windows: {
-        name: 'Окна',
-        justification:"ГЭСН 10-01-034-03",
-        unit: 'м3',
-        laborCost: 135,
-        machine: 'Электроинструмент',
-        machineTime: 10.25,
-        workers: 2,
-        crew: 'Монтажники'
-      },
-      walls: {
-        name: 'Стены',
-        justification:"ГЭСН 08-01-001-09",
-        unit: 'м3',
-        laborCost: 95.30,
-        machine: 'Растворонасос',
-        machineTime: 25.40,
-        workers: 3,
-        crew: 'Каменщики'
-      },
-      roofs: {
-        name: 'Крыши',
-        justification:"ГЭСН 12-01-002-06",
-        unit: 'м2',
-        laborCost: 110.75,
-        machine: 'Кран',
-        machineTime: 35.60,
-        workers: 3,
-        crew: 'Кровельщики'
+  const toggleLevel = (level, e) => {
+    const scrollPosition = tableRef.current?.scrollTop
+    
+    setExpandedLevels(prev => {
+      const newState = {
+        ...prev,
+        [level]: !prev[level]
       }
-    };
+      
+      setTimeout(() => {
+        if (tableRef.current) {
+          tableRef.current.scrollTop = scrollPosition
+        }
+      }, 0)
+      
+      return newState
+    })
+    
+    e.stopPropagation()
+  }
 
-    const config = typeConfig[type] || typeConfig.slabs;
-    const isCountable = type === 'stairs' || type === 'doors' || type === 'windows';
-    
-    const volume = isCountable 
-      ? elements.length 
-      : elements.reduce((sum, el) => sum + (el.volume || 0), 0);
-    const area = elements.reduce((sum, el) => sum + (el.area || 0), 0);
-    
-    const laborCost = config.laborCost;
-    const totalLaborCost = volume * laborCost;
-    const machineTime = config.machineTime;
-    const totalMachineTime = volume * machineTime;
-    
-    return {
-      type: config.name,
-      volume: isCountable ? volume.toString() : volume.toFixed(2),
-      // count: isCountable ? volume.toString() : volume.toFixed(2),
-      unit: config.unit,
-      justification: config.justification,
-      laborCost: laborCost.toFixed(2),
-      totalLaborCost: totalLaborCost.toFixed(2),
-      machine: config.machine,
-      machineTime: machineTime.toFixed(2),
-      totalMachineTime: totalMachineTime.toFixed(2),
-      workers: config.workers,
-      machines: 1,
-      shifts: 1,
-      mechDuration: Math.ceil(totalMachineTime / (1 * 8 * 1)),
-      nonMechDuration: Math.ceil(totalLaborCost / (8 * 1 * config.workers)),
-      totalDuration: Math.max(
-        Math.ceil(totalMachineTime / (1 * 8 * 1)),
-        Math.ceil(totalLaborCost / (8 * 1 * config.workers))
-      ),
-      crew: config.crew,
-      volumeCalc: isCountable 
-        ? `Количество: ${volume} ${config.unit}`
-        : type === 'walls' || type === 'roofs'
-          ? `Площадь: ${area.toFixed(2)} м2`
-          : `Объем: ${volume.toFixed(2)} м3`
-    };
-  };
+  const handleCellClick = (item, level, field, e) => {
+    if (field === 'gasn') {
+      handleGasnClick(item, level, e)
+    } else {
+      handleEditableCellClick(item, level, field, e)
+    }
+  }
 
-  const toggleLevel = (level) => {
-    setExpandedLevels(prev => ({
+  const handleGasnClick = async (item, level, e) => {
+    try {
+      setIsLoading(true)
+      const scrollPosition = tableRef.current?.scrollTop
+      
+      if (selectedCell?.level === level && selectedCell?.name === item.name) {
+        setSelectedCell(null)
+        return
+      }
+
+      setSelectedCell({
+        level,
+        name: item.name,
+        gasnId: item.gasn?.id || ''
+      })
+      
+      setTimeout(() => {
+        if (tableRef.current) {
+          tableRef.current.scrollTop = scrollPosition
+        }
+      }, 0)
+      
+    } catch (err) {
+      console.error('Ошибка при выборе ГЭСН:', err)
+    } finally {
+      setIsLoading(false)
+    }
+    
+    e.stopPropagation()
+  }
+
+  const handleEditableCellClick = (item, level, field, e) => {
+    const scrollPosition = tableRef.current?.scrollTop
+    
+    setEditingCell({
+      level,
+      name: item.name,
+      id: item.id,
+      field,
+      value: item[field] || ''
+    })
+    
+    setTimeout(() => {
+      if (tableRef.current) {
+        tableRef.current.scrollTop = scrollPosition
+      }
+    }, 0)
+    
+    e.stopPropagation()
+  }
+
+  const handleGasnSelect = async (gasnId) => {
+    if (!selectedCell || !gasnId) return
+
+    try {
+      setIsLoading(true)
+      const scrollPosition = tableRef.current?.scrollTop
+      const selectedGasnObj = gasnList.find(g => g.id === gasnId)
+      if (!selectedGasnObj) return
+
+      await axios.put('/api/dashboard/projects/workVolume', {
+        projectId: idCurrentProject,
+        elementName: selectedCell.name,
+        gasnId: gasnId
+      })
+
+      setWorkVolume(prev => {
+        const updated = {...prev}
+        for (const level in updated) {
+          updated[level] = updated[level].map(item => {
+            if (item.name === selectedCell.name) {
+              return { ...item, gasn: selectedGasnObj }
+            }
+            return item
+          })
+        }
+        return updated
+      })
+
+      setSelectedCell(null)
+      
+      setTimeout(() => {
+        if (tableRef.current) {
+          tableRef.current.scrollTop = scrollPosition
+        }
+      }, 0)
+      
+    } catch (err) {
+      console.error('Ошибка при обновлении ГЭСН:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEditableCellChange = async (e) => {
+    e.stopPropagation()
+    const newValue = e.target.value
+
+    setEditingCell(prev => ({
       ...prev,
-      [level]: !prev[level]
-    }));
-  };
+      value: newValue
+    }))
+  }
 
-  // Список типов элементов для отображения
-  const elementTypes = [
-    'columns', 'slabs', 'beams', 'stairs', 
-    'railings', 'doors', 'windows', 'walls', 'roofs'
-  ];
+  const handleEditableCellBlur = async () => {
+    if (!editingCell) return
+
+    try {
+      setIsLoading(true)
+      const scrollPosition = tableRef.current?.scrollTop
+      const { name, id, field, value } = editingCell
+      console.log(id)
+      await axios.put('/api/dashboard/projects/workVolume', {
+        projectId: idCurrentProject,
+        elementName: name,
+        elementId: id,
+        [field]: Number(value) || 0
+      })
+
+      setWorkVolume(prev => {
+        const updated = {...prev}
+        for (const lvl in updated) {
+          updated[lvl] = updated[lvl].map(item => {
+            if (item.name === name) {
+              return { ...item, [field]: Number(value) || 0 }
+            }
+            return item
+          })
+        }
+        return updated
+      })
+
+      setEditingCell(null)
+      
+      setTimeout(() => {
+        if (tableRef.current) {
+          tableRef.current.scrollTop = scrollPosition
+        }
+      }, 0)
+      
+    } catch (err) {
+      console.error('Ошибка при обновлении данных:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEditableCellKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleEditableCellBlur()
+    } else if (e.key === 'Escape') {
+      setEditingCell(null)
+    }
+  }
+
+  const renderEditableCell = (item, level, field) => {
+    if (editingCell?.level === level && 
+        editingCell?.name === item.name && 
+        editingCell?.field === field) {
+      return (
+        <td className="border p-0" onClick={(e) => e.stopPropagation()}>
+          <input
+            ref={inputRef}
+            type="number"
+            value={editingCell.value}
+            onChange={handleEditableCellChange}
+            onBlur={handleEditableCellBlur}
+            onKeyDown={handleEditableCellKeyDown}
+            className="w-full p-2 border-0 focus:ring-0"
+            min="0"
+            step="1"
+          />
+        </td>
+      )
+    }
+
+    return (
+      <td 
+        className="border p-2 cursor-pointer hover:bg-blue-50"
+        onClick={(e) => handleCellClick(item, level, field, e)}
+      >
+        {item[field] || ''}
+      </td>
+    )
+  }
+
+  const renderGasnCell = (item, level) => {
+    if (selectedCell && selectedCell.level === level && selectedCell.name === item.name) {
+      return (
+        <td className="border p-0" onClick={(e) => e.stopPropagation()}>
+          <select
+            value={selectedCell.gasnId}
+            onChange={(e) => handleGasnSelect(e.target.value)}
+            className="w-full p-2 border-0 focus:ring-0"
+            autoFocus
+            onClick={(e) => e.stopPropagation()}
+          >
+            <option value="">Выберите ГЭСН</option>
+            {gasnList.map(gasn => (
+              <option key={gasn.id} value={gasn.id}>
+                {gasn.justification} - {gasn.name}
+              </option>
+            ))}
+          </select>
+        </td>
+      )
+    }
+
+    return (
+      <td 
+        className="border p-2 cursor-pointer hover:bg-blue-50"
+        onClick={(e) => handleCellClick(item, level, 'gasn', e)}
+      >
+        {item.gasn ? item.gasn.justification : 'Не выбрано'}
+      </td>
+    )
+  }
+
+  const renderRow = (item, level) => {
+    const volume = item.volume/item.gasn?.countOfUnit ?? 0
+    // const area = item.area/item.gasn?.countOfUnit ?? 0
+    const count = item.count/item.gasn?.countOfUnit ?? 0
+
+    const isCountable = item.gasn?.unit === 'шт'
+    const quantity = isCountable ? count : volume
+
+    const totalPeopleTime = volume * item.gasn?.normalHoursPeople
+    const totalMachineTime = volume * item.gasn?.normalHoursMashine
+    const peopleQ = volume * item.gasn?.normalHoursPeople.toFixed(2) || ''
+
+    // const mechDays = totalMachineTime ? Math.ceil(totalMachineTime / 8) : ''
+    // const totalDays = Math.max(mechDays || 0, nonMechDays || 0) || ''
+    const totalMachineWork =  (totalMachineTime && item.gasn?.normalHoursMashine && item.numberOfChanges) ? Math.ceil(totalMachineTime/(parseFloat(item.gasn?.normalHoursMashine) * 8 * parseFloat(item.numberOfChanges))) : ""
+    const totalPeopleWork =  (totalPeopleTime && item.gasn?.normalHoursPeople && item.numberOfChanges) ? Math.ceil(totalMachineTime/(parseFloat(item.gasn?.normalHoursMashine) * 8 * parseFloat(item.numberOfChanges))) : ""
+    return (
+      <tr key={`${level}-${item.name}`} className="hover:bg-gray-50">
+        <td className="border p-2">{level}</td>
+        <td className="border p-2">{item.name}</td>
+        <td className="border p-2">{item.gasn?.name}</td>
+        <td className="border p-2">{item.gasn?.countOfUnit} {item.gasn?.unit || ''}</td>
+        <td className="border p-2">{item.gasn?.unit ? `${quantity.toFixed(2)}` : ''}</td>
+        {renderGasnCell(item, level)}
+        <td className="border p-2">{item.gasn?.normalHoursPeople || ''}</td>
+        <td className="border p-2">{peopleQ}</td>
+        <td className="border p-2">{item.gasn?.machine || ''}</td>
+        <td className="border p-2">{item.gasn?.normalHoursMashine || ''}</td>
+        <td className="border p-2">{totalMachineTime ? totalMachineTime.toFixed(2) : ''}</td>
+        {renderEditableCell(item, level, 'numberOfWorkers')}
+        {renderEditableCell(item, level, 'numberOfMashine')}
+        {renderEditableCell(item, level, 'numberOfChanges')}
+        <td className="border p-2">{totalMachineWork}</td>
+        <td className="border p-2">{totalPeopleWork}</td>
+        <td className="border p-2">{(totalPeopleWork && totalMachineWork) && Math.max(totalPeopleWork, totalMachineWork)}</td>
+        <td className="border p-2">{item.gasn?.crew || ''}</td>
+        <td className="border p-2">
+          {/* {isCountable
+            ? `Количество: ${count}`
+            : (item.gasn?.unit === 'м2'
+              ? `Площадь: ${area.toFixed(2)} м²`
+              : `Объем: ${volume.toFixed(2)} м³`)} */}
+          {item.gasn?.volumeCalculation}
+        </td>
+      </tr>
+    )
+  }
 
   return (
-    <div className="">
+    <div className="flex flex-col gap-5">
+      <h1 className="text-2xl font-bold text-gold">Ведомость объема работ</h1>
+
       {isLoading ? (
-        <div>Загрузка данных...</div>
+        <div>Загрузка...</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
+        <div className="overflow-auto max-h-screen" ref={tableRef}>
+          <table className="min-w-full border border-collapse text-sm">
+            <thead className="bg-gray-100 sticky top-0">
+              <tr>
                 <th className="border p-2">Этаж</th>
+                <th className="border p-2">Название элемента</th>
                 <th className="border p-2">Тип</th>
-                <th className="border p-2">Объём работ</th>
-                <th className="border p-2">Обоснование(ГЭСН)</th>
-                <th className="border p-2">Затраты труда</th>
-                <th className="border p-2">Q всего чел. ч.</th>
+                <th className="border p-2">Ед. изм.</th>
+                <th className="border p-2">Объём</th>
+                <th className="border p-2">ГЭСН</th>
+                <th className="border p-2">Норм. чел. ч.</th>
+                <th className="border p-2">Q чел.ч</th>
                 <th className="border p-2">Машина</th>
-                <th className="border p-2">норм маш.ч.</th>
-                <th className="border p-2">Q всего маш.ч.</th>
-                <th className="border p-2">Число рабочих</th>
-                <th className="border p-2">Число машин</th>
-                <th className="border p-2">Число смен</th>
-                <th className="border p-2">Продолжит. Механ. Работ дн</th>
-                <th className="border p-2">Продолжит. Немехан. Работ дн</th>
-                <th className="border p-2">Продолжит. Раб, дн.</th>
-                <th className="border p-2">Состав бригады чел.</th>
-                <th className="border p-2">Расчёт объёма</th>
+                <th className="border p-2">Маш.ч норм</th>
+                <th className="border p-2">Q маш.ч</th>
+                <th className="border p-2">Рабочие</th>
+                <th className="border p-2">Машины</th>
+                <th className="border p-2">Смены</th>
+                <th className="border p-2">Мех. дней</th>
+                <th className="border p-2">Немех. дней</th>
+                <th className="border p-2">Всего дней</th>
+                <th className="border p-2">Бригада</th>
+                <th className="border p-2">Расчёт</th>
               </tr>
             </thead>
             <tbody>
-              {workVolume.map((floorData, floorIndex) => (
-                <Fragment key={`floor-${floorIndex}`}>
-                  <tr 
-                    className="bg-blue-50 cursor-pointer hover:bg-blue-100"
-                    onClick={() => toggleLevel(floorData.level)}
+              {Object.entries(workVolume).map(([level, items]) => (
+                <Fragment key={level}>
+                  <tr
+                    onClick={(e) => toggleLevel(level, e)}
+                    className="cursor-pointer bg-blue-50 hover:bg-blue-100"
                   >
-                    <td colSpan={17} className="border p-2 font-semibold">
-                      <div className="flex items-center">
-                        {expandedLevels[floorData.level] ? '▼' : '►'} {floorData.level}
-                        <div className="ml-4 text-sm text-gray-600">
-                          {Object.entries(floorData.counts)
-                            .filter(([type, count]) => type !== 'total' && count > 0)
-                            .map(([type, count]) => `${type}: ${count}`)
-                            .join(', ')}
-                        </div>
-                      </div>
+                    <td colSpan={19} className="p-2 font-semibold">
+                      {expandedLevels[level] ? '▼' : '►'} {level}
                     </td>
                   </tr>
-                  
-                  {expandedLevels[floorData.level] && elementTypes.map(type => (
-                    floorData.counts[type] > 0 && (
-                      <tr key={`${floorData.level}-${type}`} className="hover:bg-gray-50">
-                        <td className="border p-2">{floorData.level}</td>
-                        {(() => {
-                          const totals = calculateTypeTotals(floorData.elements[type], type);
-                          return (
-                            <>
-                              <td className="border p-2">{totals.type}</td>
-                              <td className="border p-2">
-                                  {(() => {
-                                    switch(totals.type) {
-                                      case 'Лестница':
-                                      case 'Перекрытие':
-                                      case 'Стены':
-                                        return totals.volume;
-                                      case 'Колонны':
-                                        // ваш код для value2
-                                        return floorData.counts[type].toFixed(2);
-                                      case 'Двери':
-                                      case 'Окна':
-                                      case 'Крыши':
-                                        return floorData.areas[type].toFixed(2);
-                                      case 'Перила':
-                                        return floorData.lengths[type].toFixed(2);
-                                      default:
-                                        return totals.volume;
-                                    }
-                                  })()} {totals.unit}
-                              </td>
-                              <td className="border p-2">{totals.justification}</td>
-                              <td className="border p-2">{totals.laborCost}</td>
-                              <td className="border p-2">{totals.totalLaborCost}</td>
-                              <td className="border p-2">{totals.machine}</td>
-                              <td className="border p-2">{totals.machineTime}</td>
-                              <td className="border p-2">{totals.totalMachineTime}</td>
-                              <td className="border p-2">{totals.workers}</td>
-                              <td className="border p-2">{totals.machines}</td>
-                              <td className="border p-2">{totals.shifts}</td>
-                              <td className="border p-2">{totals.mechDuration}</td>
-                              <td className="border p-2">{totals.nonMechDuration}</td>
-                              <td className="border p-2">{totals.totalDuration}</td>
-                              <td className="border p-2">{totals.crew}</td>
-                              <td className="border p-2">{totals.volumeCalc}</td>
-                            </>
-                          );
-                        })()}
-                      </tr>
-                    )
-                  ))}
+                  {expandedLevels[level] && items.map(item => renderRow(item, level))}
                 </Fragment>
               ))}
             </tbody>
-            <tfoot>
-              <tr className="bg-gray-100 font-semibold">
-                <td colSpan={2} className="border p-2">Итого по проекту:</td>
-                <td colSpan={16} className="border p-2">
-                  {Object.entries(workVolume.reduce((acc, floor) => {
-                    ['columns', 'slabs', 'beams'].forEach(type => {
-                      acc[type] = (acc[type] || 0) + 
-                        floor.elements[type].reduce((sum, el) => sum + (el.volume || 0), 0);
-                    });
-                    ['stairs', 'doors', 'windows'].forEach(type => {
-                      acc[type] = (acc[type] || 0) + floor.elements[type].length;
-                    });
-                    ['walls', 'roofs'].forEach(type => {
-                      acc[type] = (acc[type] || 0) + 
-                        floor.elements[type].reduce((sum, el) => sum + (el.area || 0), 0);
-                    });
-                    return acc;
-                  }, {}))
-                  .map(([type, value]) => `${type}: ${value.toFixed(2)} ${type === 'stairs' || type === 'doors' || type === 'windows' ? 'шт' : 'м3/м2'}`)
-                  .join(', ')}
-                </td>
-                {/* <td colSpan={10} className="border p-2"></td> */}
-              </tr>
-            </tfoot>
           </table>
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -513,8 +513,8 @@ model WallElement {
   name        String
   globalId    String   @unique @map("GlobalId")
   type        String
-  level       String? 
   materials   WallMaterial[] 
+  level       String? 
   elevation   Float?
   volume      Float?
   area        Float?
@@ -541,6 +541,7 @@ model WallMaterial {
   thickness       Float?      // Толщина в мм
   volume          Float?      // Объем в м³
   area            Float?      // Площадь в м²
+  level       String? 
   elevation       Float?      // Отметка уровня
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
@@ -582,8 +583,8 @@ model RoofElement {
   name        String
   globalId    String   @unique @map("GlobalId")
   type        String
-  level       String? 
   materials   RoofMaterial[] 
+  level       String? 
   elevation   Float?
   volume      Float?
   area        Float?
@@ -610,6 +611,7 @@ model RoofMaterial {
   thickness       Float?      // Толщина в мм
   volume          Float?      // Объем в м³
   area            Float?      // Площадь в м²
+  level       String? 
   elevation       Float?      // Отметка уровня
   properties      Json?       // Дополнительные свойства
   createdAt       DateTime    @default(now())
@@ -630,9 +632,8 @@ model Gasn {
   name            String
   countOfUnit     Float       @default(0)
   unit            String
-  workVolume      Float       @default(0)
   justification   String
-  normalHoursPeaple Float       @default(0)
+  normalHoursPeople Float       @default(0)
   machine         String
   normalHoursMashine Float       @default(0)
   crew            String //состав бригады
@@ -641,9 +642,7 @@ model Gasn {
   // laborCostTime   Float       @default(0)
   // machineTime     Float       @default(0)
   // workerscostTime Float       @default(0)
-  
   // teamConsists    String? 
-
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -663,30 +662,20 @@ model Gasn {
 model WorkVolume{
   id              String      @id @default(cuid())
   name            String
-  volumeWork      Float
+  volumeWork      Float?
+  area            Float?
+  volume          Float?
+  count           Float?
   numberOfWorkers Int         @default(0)
   numberOfMashine Int         @default(0)
   numberOfChanges Int         @default(0)
-  
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  // laborCostTime   Float       @default(0)
-  // machineTime     Float       @default(0)
-  // workerscostTime Float       @default(0)
-  
-  // teamConsists    String? 
 
+  level           String?
+  elevation       Float?
+  gasnId          String?
+  gasn            Gasn?       @relation(fields: [gasnId], references: [id])
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   projectId       String?
-  // roofMaterials   RoofMaterial[]
-  // wallMaterials   WallMaterial[]
-  // columnElements  ColumnElement[]
-  // slabElements    SlabElement[]
-  // beamElements    BeamElement[]
-  // doorElements    DoorElement[]
-  // windowElements  WindowElement[]
-  // stairElements   StairElement[]
-  // railingElements RailingElement[]
 }

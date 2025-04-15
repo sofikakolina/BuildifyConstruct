@@ -2,21 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get("projectId");
-    
-    if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const gasn = await prisma.gasn.findMany({
-    //   where: { projectId }
-    });
+    const gasn = await prisma.gasn.findMany();
 
     return NextResponse.json({ gasn });
   } catch (error) {

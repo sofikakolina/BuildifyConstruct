@@ -5,7 +5,7 @@ const Page = () => {
   return (
     <div>
         <div className="p-4">
-          <h1 className="mb-4 font-bold text-gold text-2xl">Ведомость объема работ</h1>
+          
           <WorkVolume/>
         </div>
     </div>

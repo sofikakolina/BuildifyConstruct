@@ -6,7 +6,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
-    
+
     if (!projectId) {
       return NextResponse.json(
         { error: "Требуется id проекта" },
@@ -14,7 +14,42 @@ export async function GET(request) {
       );
     }
 
-    // Получаем все элементы для проекта
+    const workVolumes = await prisma.workVolume.findMany({
+      where:{
+        projectId: projectId
+      },
+      include:{
+        gasn: true
+      }
+    })
+
+    return NextResponse.json(workVolumes);
+  } catch (error) {
+    console.error("Error processing work volume:", error);
+    return NextResponse.json(
+      { error: "Failed to process work volume" },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function POST(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get("projectId");
+
+    // Очищаем старые данные
+    await prisma.workVolume.deleteMany({ where: { projectId } });
+
+    if (!projectId) {
+      return NextResponse.json(
+        { error: "Требуется id проекта" },
+        { status: 400 }
+      );
+    }
+
+    // Загружаем все элементы и материалы проекта
     const [
       columns,
       slabs,
@@ -23,165 +58,216 @@ export async function GET(request) {
       beams,
       doors,
       windows,
-      walls,
-      roofs
+      wallMaterials,
+      roofMaterials
     ] = await Promise.all([
-      prisma.columnElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.slabElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.stairElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.railingElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.beamElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.doorElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.windowElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.wallElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } }),
-      prisma.roofElement.findMany({ where: { projectId }, orderBy: { elevation: "asc" } })
+      prisma.columnElement.findMany({ where: { projectId } }),
+      prisma.slabElement.findMany({ where: { projectId } }),
+      prisma.stairElement.findMany({ where: { projectId } }),
+      prisma.railingElement.findMany({ where: { projectId } }),
+      prisma.beamElement.findMany({ where: { projectId } }),
+      prisma.doorElement.findMany({ where: { projectId } }),
+      prisma.windowElement.findMany({ where: { projectId } }),
+      prisma.wallMaterial.findMany({ where: { projectId } }),
+      prisma.roofMaterial.findMany({ where: { projectId } })
     ]);
 
-    // Создаем объект для группировки по уровням
-    const levelsMap = {};
+    // Объединяем все элементы
+    const allElements = [
+      ...columns.map(e => ({ ...e, type: "columns" })),
+      ...slabs.map(e => ({ ...e, type: "slabs" })),
+      ...stairs.map(e => ({ ...e, type: "stairs" })),
+      ...railings.map(e => ({ ...e, type: "railings" })),
+      ...beams.map(e => ({ ...e, type: "beams" })),
+      ...doors.map(e => ({ ...e, type: "doors" })),
+      ...windows.map(e => ({ ...e, type: "windows" }))
+    ];
 
-    // Функция для обработки элементов
-    const processElements = (elements, type) => {
-      elements.forEach(element => {
-        const levelKey = `Этаж ${element.level || element.elevation}`;
-        
-        if (!levelsMap[levelKey]) {
-          levelsMap[levelKey] = {
-            slabs: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            stairs: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            beams: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            columns: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            railings: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            doors: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            windows: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            walls: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            roofs: { length: 0, count: 0, volume: 0, area: 0, elements: [] },
-            totalElements: 0
-          };
-        }
-        
-        levelsMap[levelKey][type].length += element.length || 0;
-        levelsMap[levelKey][type].count++;
-        levelsMap[levelKey][type].volume += element.volume || 0;
-        levelsMap[levelKey][type].area += element.area || 0;
-        levelsMap[levelKey][type].elements.push(element);
-        levelsMap[levelKey].totalElements++;
-      });
-    };
+    // Группировка элементов по уровню и типу
+    const elementMap = new Map();
 
-    // Обрабатываем все типы элементов
-    processElements(columns, 'columns');
-    processElements(slabs, 'slabs');
-    processElements(stairs, 'stairs');
-    processElements(railings, 'railings');
-    processElements(beams, 'beams');
-    processElements(doors, 'doors');
-    processElements(windows, 'windows');
-    processElements(walls, 'walls');
-    processElements(roofs, 'roofs');
+    for (const el of allElements) {
+      const key = `${el.level || "Unknown"}_${el.type}`;
+      if (!elementMap.has(key)) {
+        elementMap.set(key, {
+          name: el.type,
+          volumeWork: 0,
+          area: 0,
+          volume: 0,
+          count: 0,
+          level: el.level || null,
+          elevation: el.elevation ?? null,
+          projectId
+        });
+      }
 
-    // Формируем итоговый результат с сохранением elevation
-    const result = Object.entries(levelsMap).map(([level, data]) => {
-      // Находим первый элемент, чтобы получить elevation (все элементы на уровне имеют одинаковый elevation)
-      const firstElement = 
-        data.columns.elements[0] || 
-        data.slabs.elements[0] || 
-        data.beams.elements[0] || 
-        data.stairs.elements[0] || 
-        data.walls.elements[0] || 
-        data.roofs.elements[0] || 
-        data.doors.elements[0] || 
-        data.windows.elements[0] || 
-        data.railings.elements[0];
-      
-      return {
-        level,
-        elevation: firstElement?.elevation || 0, // Добавляем поле elevation
-        lengths: {
-          columns: data.columns.length,
-          slabs: data.slabs.length,
-          stairs: data.stairs.length,
-          railings: data.railings.length,
-          beams: data.beams.length,
-          doors: data.doors.length,
-          windows: data.windows.length,
-          walls: data.walls.length,
-          roofs: data.roofs.length,
-          total: data.totalElements
-        },
-        counts: {
-          columns: data.columns.count,
-          slabs: data.slabs.count,
-          stairs: data.stairs.count,
-          railings: data.railings.count,
-          beams: data.beams.count,
-          doors: data.doors.count,
-          windows: data.windows.count,
-          walls: data.walls.count,
-          roofs: data.roofs.count,
-          total: data.totalElements
-        },
-        volumes: {
-          columns: data.columns.volume,
-          slabs: data.slabs.volume,
-          stairs: data.stairs.volume,
-          railings: data.railings.volume,
-          beams: data.beams.volume,
-          doors: data.doors.volume,
-          windows: data.windows.volume,
-          walls: data.walls.volume,
-          roofs: data.roofs.volume
-        },
-        areas: {
-          columns: data.columns.area,
-          slabs: data.slabs.area,
-          stairs: data.stairs.area,
-          railings: data.railings.area,
-          beams: data.beams.area,
-          doors: data.doors.area,
-          windows: data.windows.area,
-          walls: data.walls.area,
-          roofs: data.roofs.area
-        },
-        elements: {
-          columns: data.columns.elements,
-          slabs: data.slabs.elements,
-          stairs: data.stairs.elements,
-          railings: data.railings.elements,
-          beams: data.beams.elements,
-          doors: data.doors.elements,
-          windows: data.windows.elements,
-          walls: data.walls.elements,
-          roofs: data.roofs.elements
-        }
-      };
+      const agg = elementMap.get(key);
+      agg.volumeWork += el.volume || 0;
+      agg.area += el.area || 0;
+      agg.volume += el.volume || 0;
+      agg.count += 1;
+    }
+
+    // Группировка материалов по уровню и названию
+    const allMaterials = [...wallMaterials, ...roofMaterials];
+    const materialMap = new Map();
+
+    for (const mat of allMaterials) {
+      const key = `${mat.level || "Unknown"}_${mat.name}`;
+      if (!materialMap.has(key)) {
+        materialMap.set(key, {
+          name: mat.name,
+          volumeWork: 0,
+          area: 0,
+          volume: 0,
+          count: 0,
+          level: mat.level || null,
+          elevation: mat.elevation ?? null,
+          projectId
+        });
+      }
+
+      const agg = materialMap.get(key);
+      agg.volumeWork += mat.volume || 0;
+      agg.area += mat.area || 0;
+      agg.volume += mat.volume || 0;
+      agg.count += 1;
+    }
+
+    const workVolumes = [
+      ...Array.from(elementMap.values()),
+      ...Array.from(materialMap.values())
+    ];
+
+    // Сохраняем в базу
+    await prisma.workVolume.createMany({
+      data: workVolumes,
+      skipDuplicates: true
     });
 
-    result.sort((a, b) => {
-      // Проверяем, является ли уровень "Unknown Level"
-      const isUnknownA = a.level.includes("Unknown Level");
-      const isUnknownB = b.level.includes("Unknown Level");
-      
-      // Если оба "Unknown Level" - сохраняем порядок
-      if (isUnknownA && isUnknownB) return 0;
-      
-      // Если только 'a' - "Unknown Level" - помещаем его ближе к концу
-      if (isUnknownA) return 1;
-      
-      // Если только 'b' - "Unknown Level" - помещаем его ближе к концу
-      if (isUnknownB) return -1;
-      
-      // Для остальных случаев сортируем по elevation
-      const elevA = a.elevation ?? Infinity;
-      const elevB = b.elevation ?? Infinity;
-      
-      return elevA - elevB;
-    });
-    return NextResponse.json(result);
+    return NextResponse.json(workVolumes);
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    console.error("Error processing work volume:", error);
     return NextResponse.json(
-      { error: "Failed to fetch projects" },
+      { error: "Failed to process work volume" },
+      { status: 500 }
+    );
+  }
+}
+export async function PUT(request) {
+  try {
+    const requestData = await request.json();
+    const { projectId, elementName, elementId } = requestData;
+
+    // Проверка обязательных полей
+    if (!projectId || !elementName) {
+      return NextResponse.json(
+        { error: "Требуется projectId и elementName" },
+        { status: 400 }
+      );
+    }
+
+    // Подготовка данных для обновления
+    const updateData = {};
+    const updatedFields = [];
+    
+    // Обработка обновления ГЭСН (применяется ко всем записям с этим именем)
+    if (requestData.gasnId) {
+      const gasn = await prisma.gasn.findUnique({
+        where: { id: requestData.gasnId }
+      });
+
+      if (!gasn) {
+        return NextResponse.json(
+          { error: "ГЭСН не найден" },
+          { status: 404 }
+        );
+      }
+
+      updateData.gasnId = gasn.id;
+      updatedFields.push('gasnId');
+    }
+
+    // Для рабочих, машин и смен проверяем наличие elementId
+    if (requestData.numberOfWorkers !== undefined || 
+        requestData.numberOfMashine !== undefined || 
+        requestData.numberOfChanges !== undefined) {
+      
+      if (!elementId) {
+        return NextResponse.json(
+          { error: "Для обновления рабочих/машин/смен требуется elementId" },
+          { status: 400 }
+        );
+      }
+
+      // Обработка обновления количества рабочих
+      if (requestData.numberOfWorkers !== undefined) {
+        updateData.numberOfWorkers = parseInt(requestData.numberOfWorkers) || 0;
+        updatedFields.push('numberOfWorkers');
+      }
+
+      // Обработка обновления количества машин
+      if (requestData.numberOfMashine !== undefined) {
+        updateData.numberOfMashine = parseInt(requestData.numberOfMashine) || 0;
+        updatedFields.push('numberOfMashine');
+      }
+
+      // Обработка обновления количества смен
+      if (requestData.numberOfChanges !== undefined) {
+        updateData.numberOfChanges = parseInt(requestData.numberOfChanges) || 0;
+        updatedFields.push('numberOfChanges');
+      }
+    }
+
+    // Если нечего обновлять
+    if (updatedFields.length === 0) {
+      return NextResponse.json(
+        { error: "Нет данных для обновления" },
+        { status: 400 }
+      );
+    }
+
+    // Для ГЭСН обновляем все записи с этим именем
+    if (requestData.gasnId) {
+      await prisma.workVolume.updateMany({
+        where: {
+          projectId,
+          name: elementName
+        },
+        data: {
+          gasnId: updateData.gasnId
+        }
+      });
+    }
+
+    // Для рабочих/машин/смен обновляем только конкретную запись
+    if (elementId && (
+        requestData.numberOfWorkers !== undefined || 
+        requestData.numberOfMashine !== undefined || 
+        requestData.numberOfChanges !== undefined)) {
+      
+      await prisma.workVolume.update({
+        where: {
+          id: elementId,
+          projectId,
+          name: elementName
+        },
+        data: {
+          ...(requestData.numberOfWorkers !== undefined && { numberOfWorkers: updateData.numberOfWorkers }),
+          ...(requestData.numberOfMashine !== undefined && { numberOfMashine: updateData.numberOfMashine }),
+          ...(requestData.numberOfChanges !== undefined && { numberOfChanges: updateData.numberOfChanges })
+        }
+      });
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      updatedFields: updatedFields
+    });
+  } catch (error) {
+    console.error("Error updating work volume:", error);
+    return NextResponse.json(
+      { error: "Failed to update work volume data" },
       { status: 500 }
     );
   }
