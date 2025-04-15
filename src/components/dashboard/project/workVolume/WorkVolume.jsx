@@ -311,7 +311,6 @@ export default function WorkVolume() {
     const totalPeopleTime = volume * item.gasn?.normalHoursPeople
     const totalMachineTime = volume * item.gasn?.normalHoursMashine
     const peopleQ = volume * item.gasn?.normalHoursPeople.toFixed(2) || ''
-
     // const mechDays = totalMachineTime ? Math.ceil(totalMachineTime / 8) : ''
     // const totalDays = Math.max(mechDays || 0, nonMechDays || 0) || ''
     const totalMachineWork =  (totalMachineTime && item.gasn?.normalHoursMashine && item.numberOfChanges) ? Math.ceil(totalMachineTime/(parseFloat(item.gasn?.normalHoursMashine) * 8 * parseFloat(item.numberOfChanges))) : ""
@@ -325,7 +324,7 @@ export default function WorkVolume() {
         <td className="border p-2">{item.gasn?.unit ? `${quantity.toFixed(2)}` : ''}</td>
         {renderGasnCell(item, level)}
         <td className="border p-2">{item.gasn?.normalHoursPeople || ''}</td>
-        <td className="border p-2">{typeof(peopleQ)==Number ? peopleQ.toFixed(2) : ''}</td>
+        <td className="border p-2">{typeof(peopleQ)=="number" ? peopleQ.toFixed(2) : ''}</td>
         <td className="border p-2">{item.gasn?.machine || ''}</td>
         <td className="border p-2">{item.gasn?.normalHoursMashine || ''}</td>
         <td className="border p-2">{totalMachineTime ? totalMachineTime.toFixed(2) : ''}</td>
