@@ -118,14 +118,14 @@ const Gasn = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextField
-              label="Название"
+              label="Название..."
               name="name"
               value={newGasn.name}
               onChange={handleInputChange}
               fullWidth
             />
             <TextField
-              label="Единица измерения"
+              label="Единица измерения (шт, м2, м3)..."
               name="unit"
               value={newGasn.unit}
               onChange={handleInputChange}
@@ -140,7 +140,7 @@ const Gasn = () => {
               fullWidth
             />
             <TextField
-              label="Обоснование"
+              label="Обоснование (Пример: ГЭСН 01-01-008-07)..."
               name="justification"
               value={newGasn.justification}
               onChange={handleInputChange}
@@ -155,14 +155,14 @@ const Gasn = () => {
               fullWidth
             />
             <TextField
-              label="Машина"
+              label="Машина (Пример: Кран гусеничный до 16 т)..."
               name="machine"
               value={newGasn.machine}
               onChange={handleInputChange}
               fullWidth
             />
             <TextField
-              label="Норма часов (машина)"
+              label="Норма часов (машина)..."
               name="normalHoursMashine"
               type="number"
               value={newGasn.normalHoursMashine}
@@ -170,14 +170,14 @@ const Gasn = () => {
               fullWidth
             />
             <TextField
-              label="Состав бригады"
+              label="Состав бригады (Пример: Рабочие-строители 3, 4 разряда; машинисты)..."
               name="crew"
               value={newGasn.crew}
               onChange={handleInputChange}
               fullWidth
             />
             <TextField
-              label="Расчет объема"
+              label="Расчет объема (Пример: Площадь затройки * Высота этажа)..."
               name="volumeCalculation"
               value={newGasn.volumeCalculation}
               onChange={handleInputChange}
