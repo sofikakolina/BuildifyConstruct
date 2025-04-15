@@ -15,13 +15,30 @@ export async function GET(request) {
     }
 
     const workVolumes = await prisma.workVolume.findMany({
-      where:{
+      where: {
         projectId: projectId
       },
-      include:{
+      include: {
         gasn: true
-      }
-    })
+      },
+      orderBy: [
+        {
+          elevation: {
+            sort: 'asc',
+            nulls: 'last'
+          }
+        },
+        {
+          level: {
+            sort: 'desc',
+            nulls: 'last'
+          }
+        },
+        {
+          name: 'desc'
+        }
+      ]
+    });
 
     return NextResponse.json(workVolumes);
   } catch (error) {
@@ -32,7 +49,6 @@ export async function GET(request) {
     );
   }
 }
-
 
 export async function POST(request) {
   try {
