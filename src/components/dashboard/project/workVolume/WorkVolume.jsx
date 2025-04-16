@@ -105,7 +105,7 @@ export default function WorkVolume() {
       }, 0)
       
     } catch (err) {
-      console.error('Ошибка при выборе ГЭСН:', err)
+      console.error('Ошибка при выборе ГЭСН/ЕНиР:', err)
     } finally {
       setIsLoading(false)
     }
@@ -170,7 +170,7 @@ export default function WorkVolume() {
       }, 0)
       
     } catch (err) {
-      console.error('Ошибка при обновлении ГЭСН:', err)
+      console.error('Ошибка при обновлении ГЭСН/ЕНиР:', err)
     } finally {
       setIsLoading(false)
     }
@@ -279,7 +279,7 @@ export default function WorkVolume() {
             autoFocus
             onClick={(e) => e.stopPropagation()}
           >
-            <option value="">Выберите ГЭСН</option>
+            <option value="">Выберите ГЭСН/ЕНиР</option>
             {gasnList.map(gasn => (
               <option key={gasn.id} value={gasn.id}>
                 {gasn.justification} - {gasn.name}
@@ -363,7 +363,7 @@ export default function WorkVolume() {
                 <th className="border p-2">Тип</th>
                 <th className="border p-2">Ед. изм.</th>
                 <th className="border p-2">Объём</th>
-                <th className="border p-2">ГЭСН</th>
+                <th className="border p-2">ГЭСН/ЕНиР</th>
                 <th className="border p-2">Норм. чел. ч.</th>
                 <th className="border p-2">Q чел.ч</th>
                 <th className="border p-2">Машина</th>

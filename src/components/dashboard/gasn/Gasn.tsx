@@ -44,7 +44,7 @@ const Gasn = () => {
         });
         setGasnList(data.gasn);
       } catch (error) {
-        toast.error(`Ошибка загрузки ГЭСН: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
+        toast.error(`Ошибка загрузки ГЭСН/ЕНиР: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
       }
     };
 
@@ -71,9 +71,9 @@ const Gasn = () => {
         volumeCalculation: ''
       });
       setIsCreating(false);
-      toast.success("ГЭСН успешно создан!");
+      toast.success("ГЭСН/ЕНиР успешно создан!");
     } catch (error) {
-      toast.error(`Ошибка создания ГЭСН: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
+      toast.error(`Ошибка создания ГЭСН/ЕНиР: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
     }
   };
 
@@ -83,9 +83,9 @@ const Gasn = () => {
         params: { gasnId: id }
       });
       setGasnList(prev => prev.filter(item => item.id !== id));
-      toast.success("ГЭСН успешно удален!");
+      toast.success("ГЭСН/ЕНиР успешно удален!");
     } catch (error) {
-      toast.error(`Ошибка удаления ГЭСН: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
+      toast.error(`Ошибка удаления ГЭСН/ЕНиР: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
     }
   };
 
@@ -101,20 +101,20 @@ const Gasn = () => {
 
   return (
     <div className="p-6 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Управление ГЭСН</h1>
+      <h1 className="text-2xl font-bold mb-6">Управление ГЭСН/ЕНиР</h1>
       
       <div className="mb-6">
         <button 
           className="bg-gold text-white flex items-center px-5 py-2 rounded-lg"
           onClick={() => setIsCreating(true)}
         >
-          <MdAdd />Добавить ГЭСН
+          <MdAdd />Добавить ГЭСН/ЕНиР
         </button>
       </div>
 
       {isCreating && (
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-4">Создать новый ГЭСН</h2>
+          <h2 className="text-xl font-semibold mb-4">Создать новый ГЭСН/ЕНиР</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextField

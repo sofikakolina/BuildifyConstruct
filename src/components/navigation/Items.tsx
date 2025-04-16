@@ -5,7 +5,7 @@ export const AdminMenuItems = [
     { text: 'Аналитика', path: `analytics` },
     { text: 'Календарный график', path: `calendar` },
     { text: 'Ведомость объемов работ', path: `work-volume` },
-    { text: 'ГЭСН', path: `gasn` },
+    { text: 'ГЭСН/ЕНиР', path: `gasn` },
     { text: 'Конъюктурный анализ', path: `market-analysis` },
     { text: 'Доска задач', path: `tasks` },
     { text: 'Сообщения', path: `messages` },

@@ -679,3 +679,46 @@ model WorkVolume{
   updatedAt       DateTime    @updatedAt
   projectId       String?
 }
+
+// prisma/schema.prisma
+model Calculation {
+  id                      String               @id @default(cuid())
+  workersPerShift         Int
+  totalWorkers            Int
+  coefficient1            Float
+  coefficient2            Float
+  itr                     Int
+  employees               Int
+  security                Int
+  workersInBusiestShift   Int
+  women                   Int
+  men                     Int
+  calculatedAt            DateTime             @default(now())
+  structures              TemporaryStructure[]
+}
+
+model TemporaryStructure {
+  id                String     @id @default(cuid())
+  name              String
+  numberOfStaff     Int
+  maximumOfWorkers  Int
+  standardOnOneman  Float
+  EstimatedArea     Float
+  AcceptedArea      Float
+  dimensionsInPlan  String?
+  numberOfBuildings Int
+  standardProjectUsed String?
+  calculation       Calculation @relation(fields: [calculationId], references: [id])
+  calculationId     String
+}
+
+model StructureTemplate {
+  id                String     @id @default(cuid())
+  name              String     @unique
+  defaultDimensions String
+  defaultProject    String
+  minAreaPerPerson  Float
+  areaCalculation   String     // 'perPerson' or 'fixed'
+  fixedArea         Float?     // Only if areaCalculation is 'fixed'
+  buildingCount     Int
+}
