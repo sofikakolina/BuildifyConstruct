@@ -8,7 +8,7 @@ import { TextField } from "@mui/material";
 import { MdDelete, MdDownload } from 'react-icons/md';
 import { downloadFile } from "@/lib/download";
 
-const photoReports = () => {
+const PhotoReports = () => {
 	const [file, setFile] = useState(null);
 	const [documents, setDocuments] = useState([]);
 	const [nameFile, setNameFile] = useState('');
@@ -197,4 +197,4 @@ const photoReports = () => {
 	);
 };
 
-export default photoReports;
+export default PhotoReports;

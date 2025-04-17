@@ -7,6 +7,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 
+interface PhotoReportWhereInput {
+  projectId?: string;
+  taskId?: string | null;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -20,7 +25,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const where: any = {};
+    const where: PhotoReportWhereInput = {};
     if (projectId) where.projectId = projectId;
     if (taskId) where.taskId = taskId;
 

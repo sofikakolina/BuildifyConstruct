@@ -27,7 +27,7 @@ const Page = () => {
         });
         setPhotoReports(res.data.photoReports || []);
       } catch (error) {
-        toast.error('Ошибка загрузки фотоотчетов');
+        toast.error(`Ошибка загрузки фотоотчетов ${error.response?.data?.error}`);
       }
     };
 

@@ -71,7 +71,7 @@ const PhotoReports = ({ task }) => {
 			toast.success("Фотоотчет удалён");
 		}
 		} catch (error) {
-		toast.error("Не удалось удалить фотоотчет");
+			toast.error(`Не удалось удалить фотоотчет ${error.response?.data?.error}`);
 		}
 	};
 

@@ -98,6 +98,7 @@ model Project {
   documents Document[] // Документы, привязанные к проекту
   paymentDocuments paymentDocument[] // Документы, привязанные к проекту 
   photoReports photoReport[] // Документы, привязанные к проекту 
+  calendar  Calendar[] // Документы, привязанные к проекту
   ifc       IFC[] // IFC, привязанные к проекту
   slabs     Slab[]
   columns   Column[]
@@ -153,6 +154,17 @@ model PhotoReportImage {
   src       String
   request   photoReport @relation(fields: [photoReportId], references: [id], onDelete: Cascade)
 }
+
+model Calendar {
+  id        String   @id @default(cuid())
+  name      String
+  title     String?
+  path      String
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+}
+
 
 model IFC {
   id        String   @id @default(cuid())

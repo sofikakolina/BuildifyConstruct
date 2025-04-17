@@ -36,34 +36,34 @@ const PaymentDocuments = ({task}) => {
 		formData.append("title", titleFile);
 
 		try {
-		const response = await axios.post("/api/dashboard/projects/tasks/paymentDocuments", formData, {
-			headers: {
-			"Content-Type": "multipart/form-data",
-			},
-		});
+			const response = await axios.post("/api/dashboard/projects/tasks/paymentDocuments", formData, {
+				headers: {
+				"Content-Type": "multipart/form-data",
+				},
+			});
 
-		if (response.status === 200) {
-			setDocuments(prev => [response.data.paymentDocument, ...prev]) // Заменяем существующий IFC-файл
-			setNameFile('')
-			setFile(null)
-			setCost(0)
-			setTitleFile('')
-			toast.success("Платежный документ успешно загружен!");
-		}
-		} catch (error) {
-		if (axios.isAxiosError(error)) {
-			// Обработка ошибок Axios
-			if (error.response?.data?.error === "An IFC file already exists for this project") {
-			toast.error("IFC-файл уже существует для этого проекта. Удалите его перед загрузкой нового.");
-			} else {
-			toast.error("Не удалось загрузить IFC-файл");
+			if (response.status === 200) {
+				setDocuments(prev => [response.data.paymentDocument, ...prev]) // Заменяем существующий IFC-файл
+				setNameFile('')
+				setFile(null)
+				setCost(0)
+				setTitleFile('')
+				toast.success("Платежный документ успешно загружен!");
 			}
-		} else if (error instanceof Error) {
-			// Обработка других ошибок
-			toast.error(`Ошибка: ${error.message}`);
-		} else {
-			toast.error("Произошла неизвестная ошибка");
-		}
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				// Обработка ошибок Axios
+				if (error.response?.data?.error === "An IFC file already exists for this project") {
+				toast.error("IFC-файл уже существует для этого проекта. Удалите его перед загрузкой нового.");
+				} else {
+				toast.error("Не удалось загрузить IFC-файл");
+				}
+			} else if (error instanceof Error) {
+				// Обработка других ошибок
+				toast.error(`Ошибка: ${error.message}`);
+			} else {
+				toast.error("Произошла неизвестная ошибка");
+			}
 		}
 	};
 
