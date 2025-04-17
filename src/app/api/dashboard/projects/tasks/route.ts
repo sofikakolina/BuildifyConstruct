@@ -5,10 +5,17 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/auth.config";
 
 const include = {
-    assignedStaff:true,
-    documents:true,
-    paymentDocuments:true,
-}
+    assignedStaff: true,
+    documents: true,
+    paymentDocuments: true,
+    photoReports: {
+      include: {
+        images: true,
+      },
+    },
+  };
+  
+
 interface StaffMember {
     id: string;
     name: string | null; // Может быть null

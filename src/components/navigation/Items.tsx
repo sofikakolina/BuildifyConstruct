@@ -6,7 +6,7 @@ export const AdminMenuItems = [
     { text: 'Календарный график', path: `calendar` },
     { text: 'Ведомость объемов работ', path: `work-volume` },
     { text: 'ГЭСН/ЕНиР', path: `gasn` },
-    { text: 'Конъюктурный анализ', path: `market-analysis` },
+    // { text: 'Конъюктурный анализ', path: `market-analysis` },
     { text: 'Доска задач', path: `tasks` },
     { text: 'Сообщения', path: `messages` },
     { text: 'Клиенты', path: `clients` },
@@ -14,9 +14,9 @@ export const AdminMenuItems = [
     { text: 'IFC', path: `ifc` },
     { text: 'Документы', path: `documents` },
     { text: 'Платежные документы', path: `payments` },
+    { text: 'Фотоотчеты', path: `photo-reports` },
     { text: 'Материалы', path: `materials` },
     { text: 'Расчет временных сооружений', path: `temporary-structures` },
-    { text: 'Фотоотчеты', path: `photo-reports` },
     { text: 'Инициализация закупок', path: `procurement` }
 ];
 

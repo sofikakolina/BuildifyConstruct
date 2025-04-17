@@ -8,7 +8,7 @@ import { TextField } from "@mui/material";
 import { MdDelete, MdDownload } from 'react-icons/md';
 import { downloadFile } from "@/lib/download";
 
-const Documents = () => {
+const photoReports = () => {
 	const [file, setFile] = useState(null);
 	const [documents, setDocuments] = useState([]);
 	const [nameFile, setNameFile] = useState('');
@@ -98,7 +98,7 @@ const Documents = () => {
 
 	return (
 		<div className="flex flex-col gap-4 shadow-2xl p-4 border-2 rounded-lg">
-			<h2 className="text-gold font-bold text-2xl">Документы</h2>
+			<h2 className="font-bold text-lg">Документы</h2>
 			<div className="flex flex-col items-center gap-4 bg-gray-50 hover:bg-gray-100 p-6 border-2 border-gray-300 border-dashed rounded-lg transition-colors duration-200">
 				{/* Иконка и текст */}
 				<div className="flex flex-col items-center gap-2">
@@ -197,4 +197,4 @@ const Documents = () => {
 	);
 };
 
-export default Documents;
+export default photoReports;

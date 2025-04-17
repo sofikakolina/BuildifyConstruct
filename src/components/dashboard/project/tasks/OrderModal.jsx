@@ -7,6 +7,7 @@ import { OrderPriority } from '@prisma/client';
 import DetailsTextarea from './DetailsTextarea';
 import Documents from './Documents';
 import PaymentDocuments from './PaymentDocuments';
+import PhotoReports from './PhotoReports';
 // import Customer from './Customer';
 import Status from './Status';
 import TeamAssigment from './TeamAssigment';
@@ -122,6 +123,7 @@ export default function OrderModal({ task, openOrder, handleCloseOrder, priority
               <DetailsTextarea task={task} />
               <Documents formatDate={formatDate} task={task} />
               <PaymentDocuments formatDate={formatDate} task={task} />
+              <PhotoReports formatDate={formatDate} task={task} />
             </Box>
           </Grid>
           <Grid item xs={4}>

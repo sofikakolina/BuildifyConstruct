@@ -46,6 +46,7 @@
     "react-image-lightbox": "^5.1.4",
     "react-redux": "^9.2.0",
     "three": "^0.135.0",
+    "uuid": "^11.1.0",
     "web-ifc": "^0.0.68",
     "web-ifc-viewer": "^1.0.218",
     "yup": "^1.6.1"
