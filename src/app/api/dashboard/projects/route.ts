@@ -1,10 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const projectId = searchParams.get("projectId");
   try {
+    if (projectId){
+      const project = await prisma.project.findUnique({
+        where:{
+          id: projectId
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          adminId: true,
+          createdAt: true,
+          ifc: true,
+        },
+      });
+  
+      return NextResponse.json(project);
+    }
     // Получаем все проекты из базы данных
     const projects = await prisma.project.findMany({
       select: {
@@ -13,6 +32,7 @@ export async function GET() {
         description: true,
         adminId: true,
         createdAt: true,
+        ifc: true,
       },
     });
 

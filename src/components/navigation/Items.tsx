@@ -2,22 +2,22 @@
 import { Role } from '@prisma/client';
 
 export const AdminMenuItems = [
-    { text: 'Аналитика', path: `analytics` },
-    { text: 'Календарный график', path: `calendar` },
-    { text: 'Ведомость объемов работ', path: `work-volume` },
-    { text: 'ГЭСН/ЕНиР', path: `gasn` },
+    { text: 'Аналитика', path: `/dashboard/project/analytics` },
+    { text: 'Календарный график', path: `/dashboard/project/calendar` },
+    { text: 'Ведомость объемов работ', path: `/dashboard/project/work-volume` },
+    { text: 'ГЭСН/ЕНиР', path: `/dashboard/project/gasn` },
     // { text: 'Конъюктурный анализ', path: `market-analysis` },
-    { text: 'Доска задач', path: `tasks` },
-    { text: 'Сообщения', path: `messages` },
-    { text: 'Клиенты', path: `clients` },
-    { text: 'Команда проекта', path: `team` },
-    { text: 'IFC', path: `ifc` },
-    { text: 'Документы', path: `documents` },
-    { text: 'Платежные документы', path: `payments` },
-    { text: 'Фотоотчеты', path: `photo-reports` },
-    { text: 'Материалы', path: `materials` },
-    { text: 'Расчет временных сооружений', path: `temporary-structures` },
-    { text: 'Инициализация закупок', path: `procurement` }
+    { text: 'Доска задач', path: `/dashboard/project/tasks` },
+    { text: 'Сообщения', path: `/dashboard/project/messages` },
+    { text: 'Клиенты', path: `/dashboard/project/clients` },
+    { text: 'Команда проекта', path: `/dashboard/project/team` },
+    { text: 'IFC', path: `/dashboard/project/ifc` },
+    { text: 'Документы', path: `/dashboard/project/documents` },
+    { text: 'Платежные документы', path: `/dashboard/project/payments` },
+    { text: 'Фотоотчеты', path: `/dashboard/project/photo-reports` },
+    { text: 'Материалы', path: `/dashboard/project/materials` },
+    { text: 'Расчет временных сооружений', path: `/dashboard/project/temporary-structures` },
+    { text: 'Инициализация закупок', path: `/dashboard/project/procurement` }
 ];
 
 export const ExecuteMenuItems = [

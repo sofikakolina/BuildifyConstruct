@@ -18,21 +18,21 @@ enum Role {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String  @map("user_id")
-  type               String
-  provider           String
-  providerAccountId  String  @map("provider_account_id")
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
- 
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
@@ -43,116 +43,121 @@ model Session {
   userId       String   @map("user_id")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@map("sessions")
 }
 
 model User {
-  id             String     @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   firstName      String
   lastName       String
   accounts       Account[]
   sessions       Session[]
-  nickName       String?    @unique
-  email          String?    @unique
-  emailVerified  DateTime?  @map("email_verified")
+  nickName       String?   @unique
+  email          String?   @unique
+  emailVerified  DateTime? @map("email_verified")
   hashedPassword String?
   image          String?
-  role           Role       @default(Executer)
+  role           Role      @default(Executer)
   // receivedMessages Message[]  @relation("ReceiverMessages")
 
   VerificationToken VerificationToken[]
-  
-  projectId      String[]
-  project        Project[] @relation("UserProjects")
-  tasks          Task[]    @relation("AssignedTasks")
+
+  projectId    String[]
+  project      Project[]     @relation("UserProjects")
+  tasks        Task[]        @relation("AssignedTasks")
+  procurements Procurement[] @relation("AssignedTasksForProcurement")
 }
 
 model VerificationToken {
-  id String @id @default(cuid())
+  id         String   @id @default(cuid())
   identifier String?
   token      String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   expires    DateTime
-  userId String?
-  user User?  @relation(fields: [userId], references: [id])
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
 
- 
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  adminId   String?
-  description   String?
-  createdAt DateTime @default(now())
-  name      String?
-  image     String?
-  userId    String[]
-  users     User[]   @relation("UserProjects")
-  documents Document[] // Документы, привязанные к проекту
+  id               String            @id @default(cuid())
+  adminId          String?
+  description      String?
+  createdAt        DateTime          @default(now())
+  name             String?
+  image            String?
+  userId           String[]
+  users            User[]            @relation("UserProjects")
+  documents        Document[] // Документы, привязанные к проекту
   paymentDocuments paymentDocument[] // Документы, привязанные к проекту 
-  photoReports photoReport[] // Документы, привязанные к проекту 
-  calendar  Calendar[] // Документы, привязанные к проекту
-  ifc       IFC[] // IFC, привязанные к проекту
-  slabs     Slab[]
-  columns   Column[]
-  doors     Door[]
-  windows   Window[]
-  beams     Beam[]
-  stairs    Stair[]
-  railings  Railing[]
-  walls     Wall[]
-  roofs     Roof[]
+  photoReports     photoReport[] // Документы, привязанные к проекту 
+  calendar         Calendar[] // Документы, привязанные к проекту
+  ifc              IFC[] // IFC, привязанные к проекту
+  slabs            Slab[]
+  columns          Column[]
+  doors            Door[]
+  windows          Window[]
+  beams            Beam[]
+  stairs           Stair[]
+  railings         Railing[]
+  walls            Wall[]
+  roofs            Roof[]
 }
 
 model Document {
-  id        String   @id @default(cuid())
-  name     String
-  title     String
-  path      String
-  project   Project  @relation(fields: [projectId], references: [id])
-  task      Task?  @relation(fields: [taskId], references: [id])
-  taskId    String?
-  projectId String
-  createdAt DateTime @default(now())
+  id                        String        @id @default(cuid())
+  name                      String
+  title                     String
+  path                      String
+  project                   Project       @relation(fields: [projectId], references: [id])
+  task                      Task?         @relation(fields: [taskId], references: [id])
+  procurements              Procurement[] @relation("DocumentToProcurementDocuments")
+  procurementDesigns        Procurement[] @relation("DocumentToProcurementDesigns")
+  procurementDocumentation  Procurement[] @relation("DocumentToProcurementDocumentation")
+  procurementDeliveryDocs   Procurement[] @relation("DocumentToProcurementDeliveryDocs")
+  taskId                    String?
+  projectId                 String
+  createdAt                 DateTime      @default(now())
 }
 
 model paymentDocument {
-  id        String   @id @default(cuid())
-  name      String
-  cost      Int
-  title     String
-  path      String
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  task      Task?  @relation(fields: [taskId], references: [id])
-  taskId    String?
-  createdAt DateTime @default(now())
+  id          String        @id @default(cuid())
+  name        String
+  cost        Int
+  title       String
+  path        String
+  project     Project       @relation(fields: [projectId], references: [id])
+  projectId   String
+  task        Task?         @relation(fields: [taskId], references: [id])
+  procurement Procurement[] @relation("AccountingDocmentToProcurementAccountingDocs")
+  taskId      String?
+  createdAt   DateTime      @default(now())
 }
 
 model photoReport {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   name      String
   title     String
   images    PhotoReportImage[]
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project            @relation(fields: [projectId], references: [id])
   projectId String
-  task      Task?  @relation(fields: [taskId], references: [id])
+  task      Task?              @relation(fields: [taskId], references: [id])
   taskId    String?
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
 }
 
 model PhotoReportImage {
-  id        String         @id @default(cuid())
+  id            String      @id @default(cuid())
   photoReportId String
-  src       String
-  request   photoReport @relation(fields: [photoReportId], references: [id], onDelete: Cascade)
+  src           String
+  request       photoReport @relation(fields: [photoReportId], references: [id], onDelete: Cascade)
 }
 
 model Calendar {
@@ -165,22 +170,22 @@ model Calendar {
   createdAt DateTime @default(now())
 }
 
-
 model IFC {
-  id        String   @id @default(cuid())
-  name      String
-  title     String
-  path      String   @unique
-  projectId String 
-  project   Project  @relation(fields: [projectId], references: [id])
-  createdAt DateTime @default(now())
+  id          String        @id @default(cuid())
+  name        String
+  title       String
+  path        String        @unique
+  projectId   String        @unique
+  project     Project       @relation(fields: [projectId], references: [id])
+  createdAt   DateTime      @default(now())
+  Procurement Procurement[]
 }
 
 model Task {
-  id               String               @id @default(cuid())
+  id               String            @id @default(cuid())
   userId           String?
   projectId        String?
-  status           TaskStatus       @default(Todo)
+  status           TaskStatus        @default(Todo)
   priority         OrderPriority     @default(Normal)
   name             String
   details          String?
@@ -193,7 +198,7 @@ model Task {
   paymentDocuments paymentDocument[] // Документы, привязанные к проекту 
   photoReports     photoReport[] // Документы, привязанные к проекту 
   startDate        DateTime          @default(now())
-  targetEnd        DateTime?      
+  targetEnd        DateTime?
 }
 
 enum TaskStatus {
@@ -220,81 +225,81 @@ model Slab {
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
   slabs       SlabElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalVolume])
 }
 
 model SlabElement {
-  id          String   @id @default(cuid())
-  slabId      String
-  slab        Slab     @relation(fields: [slabId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  elevation   Float?   // Для точной сортировки уровней
-  volume      Float?
-  area        Float?
-  thickness   Float?
-  material    String?
-  ifcType     String?  @map("IFCType")
-  properties  Json?
-  projectId   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  id         String   @id @default(cuid())
+  slabId     String
+  slab       Slab     @relation(fields: [slabId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  elevation  Float? // Для точной сортировки уровней
+  volume     Float?
+  area       Float?
+  thickness  Float?
+  material   String?
+  ifcType    String?  @map("IFCType")
+  properties Json?
+  projectId  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
 
-  @@map("slab_elements")
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("slab_elements")
 }
 
 model Column {
-  id          String        @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
-  totalCount  Int           @default(0)
-  totalVolume Float         @default(0)
+  totalCount  Int             @default(0)
+  totalVolume Float           @default(0)
   description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   projectId   String?
-  project     Project?      @relation(fields: [projectId], references: [id])
+  project     Project?        @relation(fields: [projectId], references: [id])
   columns     ColumnElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalVolume])
 }
 
 model ColumnElement {
-  id          String   @id @default(cuid())
-  columnId    String
-  column      Column     @relation(fields: [columnId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  elevation   Float?   // Для точной сортировки уровней
-  volume      Float?
-  area        Float?
-  thickness   Float?
-  material    String?
-  projectId   String?
-  ifcType     String?  @map("IFCType")
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  id         String   @id @default(cuid())
+  columnId   String
+  column     Column   @relation(fields: [columnId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  elevation  Float? // Для точной сортировки уровней
+  volume     Float?
+  area       Float?
+  thickness  Float?
+  material   String?
+  projectId  String?
+  ifcType    String?  @map("IFCType")
+  properties Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
 
-  @@map("column_elements")
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("column_elements")
 }
 
 model Door {
@@ -308,231 +313,230 @@ model Door {
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
   doors       DoorElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalArea])
 }
 
 model DoorElement {
-  id          String   @id @default(cuid())
-  doorId    String
-  door        Door     @relation(fields: [doorId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  elevation   Float?   // Для точной сортировки уровней
-  area        Float?
-  size        Float?
-  height      Float?
-  width       Float?
-  ifcType     String?  @map("IFCType")
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  
-  @@map("door_elements")
+  id         String   @id @default(cuid())
+  doorId     String
+  door       Door     @relation(fields: [doorId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  elevation  Float? // Для точной сортировки уровней
+  area       Float?
+  size       Float?
+  height     Float?
+  width      Float?
+  ifcType    String?  @map("IFCType")
+  properties Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projectId  String?
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("door_elements")
 }
 
 model Window {
-  id          String        @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
-  totalCount  Int           @default(0)
-  totalArea   Float         @default(0)
+  totalCount  Int             @default(0)
+  totalArea   Float           @default(0)
   description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   projectId   String?
-  project     Project?      @relation(fields: [projectId], references: [id])
+  project     Project?        @relation(fields: [projectId], references: [id])
   windows     WindowElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalArea])
 }
 
 model WindowElement {
-  id          String   @id @default(cuid())
-  windowId    String
-  window      Window     @relation(fields: [windowId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  elevation   Float?   // Для точной сортировки уровней
-  area        Float?
-  size        Float?
-  height      Float?
-  width       Float?
-  ifcType     String?  @map("IFCType")
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  id         String   @id @default(cuid())
+  windowId   String
+  window     Window   @relation(fields: [windowId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  elevation  Float? // Для точной сортировки уровней
+  area       Float?
+  size       Float?
+  height     Float?
+  width      Float?
+  ifcType    String?  @map("IFCType")
+  properties Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projectId  String?
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
 
-  @@map("window_elements")
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("window_elements")
 }
 
 model Beam {
   id          String        @id @default(cuid())
   name        String
   totalCount  Int           @default(0)
-  totalVolume   Float         @default(0)
+  totalVolume Float         @default(0)
   description String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
   beams       BeamElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalVolume])
 }
 
 model BeamElement {
-  id          String   @id @default(cuid())
-  beamId      String
-  beam        Beam     @relation(fields: [beamId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  material    String? 
-  elevation   Float?   // Для точной сортировки уровней
-  volume      Float?
-  size        Float?
-  height      Float?
-  width       Float?
-  length      Float?
-  ifcType     String?  @map("IFCType")
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  
-  @@map("beam_elements")
+  id         String   @id @default(cuid())
+  beamId     String
+  beam       Beam     @relation(fields: [beamId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  material   String?
+  elevation  Float? // Для точной сортировки уровней
+  volume     Float?
+  size       Float?
+  height     Float?
+  width      Float?
+  length     Float?
+  ifcType    String?  @map("IFCType")
+  properties Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projectId  String?
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("beam_elements")
 }
 
 model Stair {
-  id          String        @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
-  totalCount  Int           @default(0)
-  totalVolume Float         @default(0)
+  totalCount  Int            @default(0)
+  totalVolume Float          @default(0)
   description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   projectId   String?
-  project     Project?      @relation(fields: [projectId], references: [id])
+  project     Project?       @relation(fields: [projectId], references: [id])
   stairs      StairElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalVolume])
 }
 
 model StairElement {
-  id          String   @id @default(cuid())
-  stairId     String
-  stair       Stair     @relation(fields: [stairId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  material    String? 
-  elevation   Float?   // Для точной сортировки уровней
-  volume      Float?
-  width       Float?
-  stepHeight  Float?
-  stepLength  Float?
-  numberOfSteps  Int?
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  
-  @@map("stair_elements")
+  id            String   @id @default(cuid())
+  stairId       String
+  stair         Stair    @relation(fields: [stairId], references: [id])
+  name          String
+  globalId      String   @unique @map("GlobalId")
+  type          String
+  level         String?
+  material      String?
+  elevation     Float? // Для точной сортировки уровней
+  volume        Float?
+  width         Float?
+  stepHeight    Float?
+  stepLength    Float?
+  numberOfSteps Int?
+  properties    Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  projectId     String?
+  gasnId        String?
+  gasn          Gasn?    @relation(fields: [gasnId], references: [id])
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("stair_elements")
 }
 
 model Railing {
-  id          String        @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
-  totalCount  Int           @default(0)
-  totalLength Float         @default(0)
+  totalCount  Int              @default(0)
+  totalLength Float            @default(0)
   description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   projectId   String?
-  project     Project?      @relation(fields: [projectId], references: [id])
+  project     Project?         @relation(fields: [projectId], references: [id])
   railings    RailingElement[]
-  
+
   // Добавляем индексы для часто используемых полей
   @@index([totalCount])
   @@index([totalLength])
 }
 
 model RailingElement {
-  id          String   @id @default(cuid())
-  railingId   String
-  stair       Railing  @relation(fields: [railingId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  level       String? 
-  material    String? 
-  elevation   Float?
-  volume      Float?
-  height      Float?
-  length      Float?
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  
-  @@map("railing_elements")
+  id         String   @id @default(cuid())
+  railingId  String
+  stair      Railing  @relation(fields: [railingId], references: [id])
+  name       String
+  globalId   String   @unique @map("GlobalId")
+  type       String
+  level      String?
+  material   String?
+  elevation  Float?
+  volume     Float?
+  height     Float?
+  length     Float?
+  properties Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projectId  String?
+  gasnId     String?
+  gasn       Gasn?    @relation(fields: [gasnId], references: [id])
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("railing_elements")
 }
-
 
 model Wall {
   id          String        @id @default(cuid())
   name        String
   totalCount  Int           @default(0)
   totalVolume Float         @default(0)
-  totalArea Float         @default(0)
+  totalArea   Float         @default(0)
   description String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  walls    WallElement[]
-  
+  walls       WallElement[]
+
   // Добавляем индексы для часто используемых полей
   @@index([totalVolume])
   @@index([totalCount])
@@ -540,54 +544,54 @@ model Wall {
 }
 
 model WallElement {
-  id          String   @id @default(cuid())
-  wallId      String
-  wall        Wall  @relation(fields: [wallId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  materials   WallMaterial[] 
-  level       String? 
-  elevation   Float?
-  volume      Float?
-  area        Float?
-  height      Float?
-  length      Float?
-  width       Float?
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  
-  @@map("wall_elements")
+  id         String         @id @default(cuid())
+  wallId     String
+  wall       Wall           @relation(fields: [wallId], references: [id])
+  name       String
+  globalId   String         @unique @map("GlobalId")
+  type       String
+  materials  WallMaterial[]
+  level      String?
+  elevation  Float?
+  volume     Float?
+  area       Float?
+  height     Float?
+  length     Float?
+  width      Float?
+  properties Json?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  projectId  String?
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("wall_elements")
 }
 
 model WallMaterial {
-  id              String      @id @default(cuid())
-  wallElementId   String
-  wallElement     WallElement @relation(fields: [wallElementId], references: [id])
-  name            String
-  type            String?
-  thickness       Float?      // Толщина в мм
-  volume          Float?      // Объем в м³
-  area            Float?      // Площадь в м²
-  level       String? 
-  elevation       Float?      // Отметка уровня
-  properties      Json?       // Дополнительные свойства
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  projectId       String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
+  id            String      @id @default(cuid())
+  wallElementId String
+  wallElement   WallElement @relation(fields: [wallElementId], references: [id])
+  name          String
+  type          String?
+  thickness     Float? // Толщина в мм
+  volume        Float? // Объем в м³
+  area          Float? // Площадь в м²
+  level         String?
+  elevation     Float? // Отметка уровня
+  properties    Json? // Дополнительные свойства
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  projectId     String?
+  gasnId        String?
+  gasn          Gasn?       @relation(fields: [gasnId], references: [id])
 
-  @@map("wall_materials")
   @@index([name])
   @@index([type])
   @@index([elevation])
   @@index([wallElementId])
+  @@map("wall_materials")
 }
 
 model Roof {
@@ -595,14 +599,14 @@ model Roof {
   name        String
   totalCount  Int           @default(0)
   totalVolume Float         @default(0)
-  totalArea Float         @default(0)
+  totalArea   Float         @default(0)
   description String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
-  roofs    RoofElement[]
-  
+  roofs       RoofElement[]
+
   // Добавляем индексы для часто используемых полей
   @@index([totalVolume])
   @@index([totalCount])
@@ -610,75 +614,75 @@ model Roof {
 }
 
 model RoofElement {
-  id          String   @id @default(cuid())
-  roofId      String
-  wall        Roof  @relation(fields: [roofId], references: [id])
-  name        String
-  globalId    String   @unique @map("GlobalId")
-  type        String
-  materials   RoofMaterial[] 
-  level       String? 
-  elevation   Float?
-  volume      Float?
-  area        Float?
-  height      Float?
-  length      Float?
-  width       Float?
-  properties  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  projectId   String?
-  
-  @@map("roof_elements")
+  id         String         @id @default(cuid())
+  roofId     String
+  wall       Roof           @relation(fields: [roofId], references: [id])
+  name       String
+  globalId   String         @unique @map("GlobalId")
+  type       String
+  materials  RoofMaterial[]
+  level      String?
+  elevation  Float?
+  volume     Float?
+  area       Float?
+  height     Float?
+  length     Float?
+  width      Float?
+  properties Json?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  projectId  String?
+
   @@index([level])
   @@index([elevation])
   @@index([type])
+  @@map("roof_elements")
 }
 
 model RoofMaterial {
-  id              String      @id @default(cuid())
-  roofElementId   String
-  roofElement     RoofElement @relation(fields: [roofElementId], references: [id])
-  name            String
-  type            String?
-  thickness       Float?      // Толщина в мм
-  volume          Float?      // Объем в м³
-  area            Float?      // Площадь в м²
-  level       String? 
-  elevation       Float?      // Отметка уровня
-  properties      Json?       // Дополнительные свойства
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  projectId       String?
-  gasnId          String?
-  gasn            Gasn? @relation(fields: [gasnId], references: [id])
-  
-  @@map("roof_materials")
+  id            String      @id @default(cuid())
+  roofElementId String
+  roofElement   RoofElement @relation(fields: [roofElementId], references: [id])
+  name          String
+  type          String?
+  thickness     Float? // Толщина в мм
+  volume        Float? // Объем в м³
+  area          Float? // Площадь в м²
+  level         String?
+  elevation     Float? // Отметка уровня
+  properties    Json? // Дополнительные свойства
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  projectId     String?
+  gasnId        String?
+  gasn          Gasn?       @relation(fields: [gasnId], references: [id])
+
   @@index([name])
   @@index([type])
   @@index([elevation])
   @@index([roofElementId])
+  @@map("roof_materials")
 }
 
 model Gasn {
-  id              String      @id @default(cuid())
-  name            String
-  countOfUnit     Float       @default(0)
-  unit            String
-  justification   String
-  normalHoursPeople Float       @default(0)
-  machine         String
-  normalHoursMashine Float       @default(0)
-  crew            String //состав бригады
-  volumeCalculation String? //как происходит расчет работы
-  
+  id                 String  @id @default(cuid())
+  name               String
+  countOfUnit        Float   @default(0)
+  unit               String
+  justification      String
+  normalHoursPeople  Float   @default(0)
+  machine            String
+  normalHoursMashine Float   @default(0)
+  crew               String //состав бригады
+  volumeCalculation  String? //как происходит расчет работы
+
   // laborCostTime   Float       @default(0)
   // machineTime     Float       @default(0)
   // workerscostTime Float       @default(0)
   // teamConsists    String? 
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   projectId       String?
   workVolumes     WorkVolume[]
   roofMaterials   RoofMaterial[]
@@ -692,66 +696,99 @@ model Gasn {
   railingElements RailingElement[]
 }
 
-model WorkVolume{
-  id              String      @id @default(cuid())
+model WorkVolume {
+  id              String @id @default(cuid())
   name            String
   volumeWork      Float?
   area            Float?
   volume          Float?
   count           Float?
-  numberOfWorkers Int         @default(0)
-  numberOfMashine Int         @default(0)
-  numberOfChanges Int         @default(0)
+  numberOfWorkers Int    @default(0)
+  numberOfMashine Int    @default(0)
+  numberOfChanges Int    @default(0)
 
-  level           String?
-  elevation       Float?
-  gasnId          String?
-  gasn            Gasn?       @relation(fields: [gasnId], references: [id])
+  level     String?
+  elevation Float?
+  gasnId    String?
+  gasn      Gasn?   @relation(fields: [gasnId], references: [id])
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  projectId       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  projectId String?
 }
 
 // prisma/schema.prisma
 model Calculation {
-  id                      String               @id @default(cuid())
-  workersPerShift         Int
-  totalWorkers            Int
-  coefficient1            Float
-  coefficient2            Float
-  itr                     Int
-  employees               Int
-  security                Int
-  workersInBusiestShift   Int
-  women                   Int
-  men                     Int
-  calculatedAt            DateTime             @default(now())
-  structures              TemporaryStructure[]
+  id                    String               @id @default(cuid())
+  workersPerShift       Int
+  totalWorkers          Int
+  coefficient1          Float
+  coefficient2          Float
+  itr                   Int
+  employees             Int
+  security              Int
+  workersInBusiestShift Int
+  women                 Int
+  men                   Int
+  calculatedAt          DateTime             @default(now())
+  structures            TemporaryStructure[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model TemporaryStructure {
-  id                String     @id @default(cuid())
-  name              String
-  numberOfStaff     Int
-  maximumOfWorkers  Int
-  standardOnOneman  Float
-  EstimatedArea     Float
-  AcceptedArea      Float
-  dimensionsInPlan  String?
-  numberOfBuildings Int
+  id                  String      @id @default(cuid())
+  name                String
+  numberOfStaff       Int
+  maximumOfWorkers    Int
+  standardOnOneman    Float
+  EstimatedArea       Float
+  AcceptedArea        Float
+  dimensionsInPlan    String?
+  numberOfBuildings   Int
   standardProjectUsed String?
-  calculation       Calculation @relation(fields: [calculationId], references: [id])
-  calculationId     String
+  calculation         Calculation @relation(fields: [calculationId], references: [id])
+  calculationId       String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model StructureTemplate {
-  id                String     @id @default(cuid())
-  name              String     @unique
+  id                String @id @default(cuid())
+  name              String @unique
   defaultDimensions String
   defaultProject    String
   minAreaPerPerson  Float
-  areaCalculation   String     // 'perPerson' or 'fixed'
-  fixedArea         Float?     // Only if areaCalculation is 'fixed'
+  areaCalculation   String // 'perPerson' or 'fixed'
+  fixedArea         Float? // Only if areaCalculation is 'fixed'
   buildingCount     Int
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Procurement {
+  id                       String            @id @default(cuid())
+  name                     String
+  description              String?
+  details                  String?
+  status                   ProcurementStatus @default(Initial)
+  assignedStaff            User[]            @relation("AssignedTasksForProcurement")
+  documents                Document[]        @relation("DocumentToProcurementDocuments")
+  designDocuments          Document[]        @relation("DocumentToProcurementDesigns")
+  procurementDocumentation Document[]        @relation("DocumentToProcurementDocumentation")
+  deliveryDocumentation    Document[]        @relation("DocumentToProcurementDeliveryDocs")
+  accountingDocuments      paymentDocument[] @relation("AccountingDocmentToProcurementAccountingDocs")
+  projectId                String
+  ifc                      IFC               @relation(fields: [projectId], references: [projectId])
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+enum ProcurementStatus {
+  Initial
+  InWork
+  Check
+  ForCorrection
+  Complete
+  Cancelled
 }
