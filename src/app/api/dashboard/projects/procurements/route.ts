@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
+    const procurementId = searchParams.get("procurementId");
     if (!projectId) {
       return NextResponse.json(
         { error: "Нужен id проекта" },
@@ -14,6 +15,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    if (procurementId) {
+      const procurement = await prisma.procurement.findUnique({
+        where:{
+          id: procurementId
+        },
+        include:{
+          assignedStaff: true,
+          documents: true,
+          designDocuments: true,
+          procurementDocumentation: true,
+          deliveryDocumentation: true,
+          accountingDocuments: true,
+          ifc: true
+        }
+      })
+      return NextResponse.json(procurement);
+    }
     const procurements = await prisma.procurement.findMany({
       where: {
         projectId: projectId,

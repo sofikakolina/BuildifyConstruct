@@ -6,7 +6,8 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { ProcurementStatus } from '@prisma/client';
 import { TextField } from '@mui/material';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+
 const translateStatus = (status) => {
   const statusTranslations = {
     [ProcurementStatus.Initial]: 'Начальный',
@@ -20,8 +21,12 @@ const translateStatus = (status) => {
 };
 
 const ProcurementsCreate = () => {
-    const router = useRouter()
+    const router = useRouter();
     const idCurrentProject = useAppSelector(state => state.idCurrentProject.value);
+    const urlPath = usePathname().split("/");
+    const procurementId = urlPath[urlPath.length - 1];
+    const isEditMode = procurementId !== 'create';
+
     const [procurement, setProcurement] = useState({
         name: "",
         description: "",
@@ -46,6 +51,7 @@ const ProcurementsCreate = () => {
     const [file, setFile] = useState(null);
     const [nameFile, setNameFile] = useState('');
     const [titleFile, setTitleFile] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     // Refs для обработки кликов вне области
     const staffDropdownRef = useRef(null);
@@ -57,20 +63,51 @@ const ProcurementsCreate = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const [staffRes, documentsRes] = await Promise.all([
-                axios.get('/api/dashboard/projects/team', {
-                    params: { projectId: idCurrentProject }
-                }),
-                axios.get('/api/dashboard/projects/tasks/documents', {
-                    params: { projectId: idCurrentProject }
-                }),
-            ]);
-            setStaff(staffRes.data);
-            setDocuments(documentsRes.data.documents);
+            try {
+                setIsLoading(true);
+                const [staffRes, documentsRes] = await Promise.all([
+                    axios.get('/api/dashboard/projects/team', {
+                        params: { projectId: idCurrentProject }
+                    }),
+                    axios.get('/api/dashboard/projects/tasks/documents', {
+                        params: { projectId: idCurrentProject }
+                    }),
+                ]);
+
+                setStaff(staffRes.data);
+                setDocuments(documentsRes.data.documents);
+
+                if (isEditMode) {
+                    const procurementRes = await axios.get('/api/dashboard/projects/procurements', {
+                        params: { projectId: idCurrentProject, procurementId }
+                    });
+                    
+                    const procurementData = procurementRes.data;
+                    setProcurement({
+                        name: procurementData.name,
+                        description: procurementData.description || "",
+                        details: procurementData.details || "",
+                        status: procurementData.status,
+                        projectId: procurementData.projectId,
+                        assignedStaff: procurementData.assignedStaff.map(staff => staff.id),
+                        documents: procurementData.documents.map(doc => doc.id),
+                        designDocuments: procurementData.designDocuments.map(doc => doc.id),
+                        procurementDocumentation: procurementData.procurementDocumentation.map(doc => doc.id),
+                        deliveryDocumentation: procurementData.deliveryDocumentation.map(doc => doc.id),
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+                toast.error('Не удалось загрузить данные');
+            } finally {
+                setIsLoading(false);
+            }
         };
 
-        fetchData();
-    }, [idCurrentProject]);
+        if (idCurrentProject) {
+            fetchData();
+        }
+    }, [idCurrentProject, procurementId, isEditMode]);
 
     // Обработчик кликов вне области
     useEffect(() => {
@@ -143,13 +180,19 @@ const ProcurementsCreate = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/dashboard/projects/procurements', procurement);
-            console.log('Закупка создана:', response.data);
-            toast.success('Закупка успешно создана!');
-            router.push("/dashboard/project/procurement")
+            if (isEditMode) {
+                const response = await axios.put(`/api/dashboard/projects/procurements/${procurementId}`, procurement);
+                console.log('Закупка обновлена:', response.data);
+                toast.success('Закупка успешно обновлена!');
+            } else {
+                const response = await axios.post('/api/dashboard/projects/procurements', procurement);
+                console.log('Закупка создана:', response.data);
+                toast.success('Закупка успешно создана!');
+            }
+            router.push("/dashboard/project/procurement");
         } catch (error) {
-            console.error('Ошибка при создании закупки:', error);
-            toast.error('Ошибка при создании закупки');
+            console.error('Ошибка:', error);
+            toast.error(`Ошибка при ${isEditMode ? 'обновлении' : 'создании'} закупки`);
         }
     };
 
@@ -198,9 +241,21 @@ const ProcurementsCreate = () => {
 
     const buyers = staff.filter(user => user.role === 'Buyer');
 
+    if (isLoading) {
+        return (
+            <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Создание новой закупки</h1>
+            <h1 className="text-2xl font-bold mb-6 text-gray-800">
+                {isEditMode ? 'Редактирование закупки' : 'Создание новой закупки'}
+            </h1>
             
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Основные поля формы */}
@@ -463,12 +518,19 @@ const ProcurementsCreate = () => {
                     )}
                 </div>
 
-                <div className="pt-4 flex justify-end">
+                <div className="pt-4 flex justify-end space-x-4">
+                    <button
+                        type="button"
+                        onClick={() => router.push("/dashboard/project/procurement")}
+                        className="inline-flex justify-center py-2 px-6 border border-gray-300 shadow-sm text-lg font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    >
+                        Отмена
+                    </button>
                     <button
                         type="submit"
                         className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-lg font-medium rounded-lg text-white bg-gold hover:bg-gold-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold transition-colors"
                     >
-                        Создать закупку
+                        {isEditMode ? 'Сохранить изменения' : 'Создать закупку'}
                     </button>
                 </div>
             </form>
