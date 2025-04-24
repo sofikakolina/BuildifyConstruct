@@ -2,14 +2,22 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { ProcurementStatus } from "@prisma/client";
+// import { ProcurementStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+// Тип для отношений закупки
+type ProcurementRelations = {
+  documents: { id: string }[];
+  designDocuments: { id: string }[];
+  procurementDocumentation: { id: string }[];
+  deliveryDocumentation: { id: string }[];
+  assignedStaff: { id: string }[];
+};
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get("projectId");
     const procurementId = searchParams.get("procurementId");
     
     if (!procurementId) {
@@ -57,16 +65,16 @@ export async function PUT(request: NextRequest) {
       description,
       details,
       status,
-      assignedStaff,
-      documents,
-      designDocuments,
-      procurementDocumentation,
-      deliveryDocumentation
+      assignedStaff = [],
+      documents = [],
+      designDocuments = [],
+      procurementDocumentation = [],
+      deliveryDocumentation = []
     } = await request.json();
 
-    if (!name || !status) {
+    if (!name || !status || !procurementId) {
       return NextResponse.json(
-        { error: "Название и статус обязательны" },
+        { error: "Название, статус и ID закупки обязательны" },
         { status: 400 }
       );
     }
@@ -75,11 +83,11 @@ export async function PUT(request: NextRequest) {
     const currentProcurement = await prisma.procurement.findUnique({
       where: { id: procurementId },
       include: {
-        assignedStaff: true,
-        documents: true,
-        designDocuments: true,
-        procurementDocumentation: true,
-        deliveryDocumentation: true
+        assignedStaff: { select: { id: true } },
+        documents: { select: { id: true } },
+        designDocuments: { select: { id: true } },
+        procurementDocumentation: { select: { id: true } },
+        deliveryDocumentation: { select: { id: true } }
       }
     });
 
@@ -90,23 +98,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Определяем какие связи нужно добавить/удалить
-    const staffToConnect = assignedStaff.filter((id: string) => 
-      !currentProcurement.assignedStaff.some(staff => staff.id === id)
-    );
-    const staffToDisconnect = currentProcurement.assignedStaff
-      .filter(staff => !assignedStaff.includes(staff.id))
-      .map(staff => staff.id);
-
-    // Аналогично для документов (можно вынести в отдельную функцию)
-    const updateRelations = async (relation: string, newIds: string[]) => {
-      const currentItems = currentProcurement[relation];
-      const toConnect = newIds.filter(id => 
-        !currentItems.some((item: {id: string}) => item.id === id)
-      );
-      const toDisconnect = currentItems
-        .filter((item: {id: string}) => !newIds.includes(item.id))
-        .map((item: {id: string}) => item.id);
+    // Функция для обновления связей с типизацией
+    const updateRelations = <T extends keyof ProcurementRelations>(
+      relation: T,
+      newIds: string[]
+    ) => {
+      const currentItems = currentProcurement[relation] as { id: string }[];
+      const currentIds = currentItems.map(item => item.id);
+      
+      const toConnect = newIds.filter(id => !currentIds.includes(id));
+      const toDisconnect = currentIds.filter(id => !newIds.includes(id));
 
       return {
         connect: toConnect.map(id => ({ id })),
@@ -121,14 +122,11 @@ export async function PUT(request: NextRequest) {
         description,
         details,
         status,
-        assignedStaff: {
-          connect: staffToConnect.map(id => ({ id })),
-          disconnect: staffToDisconnect.map(id => ({ id }))
-        },
-        documents: await updateRelations('documents', documents),
-        designDocuments: await updateRelations('designDocuments', designDocuments),
-        procurementDocumentation: await updateRelations('procurementDocumentation', procurementDocumentation),
-        deliveryDocumentation: await updateRelations('deliveryDocumentation', deliveryDocumentation)
+        assignedStaff: updateRelations('assignedStaff', assignedStaff),
+        documents: updateRelations('documents', documents),
+        designDocuments: updateRelations('designDocuments', designDocuments),
+        procurementDocumentation: updateRelations('procurementDocumentation', procurementDocumentation),
+        deliveryDocumentation: updateRelations('deliveryDocumentation', deliveryDocumentation)
       },
       include: {
         assignedStaff: true,
@@ -152,6 +150,13 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const procurementId = request.nextUrl.pathname.split('/').pop();
+
+    if (!procurementId) {
+      return NextResponse.json(
+        { error: "Необходим ID закупки" },
+        { status: 400 }
+      );
+    }
 
     await prisma.procurement.delete({
       where: { id: procurementId }
